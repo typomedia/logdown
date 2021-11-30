@@ -1,0 +1,64 @@
+parameters:
+    locale: de
+    application:
+        name: logfony
+        version: 1.0.0
+        company: typomedia
+        author: Philipp Speck
+
+framework:
+    session: ~
+    default_locale:  "%locale%"
+    translator:      { fallbacks: ["%locale%"] }
+    secret: CHANGEME
+    router:
+        resource: '%kernel.root_dir%/config/routing.yml'
+    assets: ~
+    profiler:
+        enabled: '%kernel.debug%'
+
+web_profiler:
+    toolbar: true
+    intercept_redirects: false
+
+twig:
+    globals:
+        application: "%application%"
+    strict_variables: true
+    exception_controller: null
+
+# Doctrine Configuration
+doctrine:
+    dbal:
+        driver:   pdo_sqlite
+        path:     '%kernel.root_dir%/../var/data/sqlog.db'
+        charset:  UTF8
+
+    orm:
+        auto_generate_proxy_classes: "%kernel.debug%"
+        naming_strategy: doctrine.orm.naming_strategy.underscore
+        auto_mapping: true
+
+monolog:
+    handlers:
+        main:
+            type: fingers_crossed
+            action_level: debug
+            handler: nested
+        nested:
+            type: stream
+            path: "%kernel.logs_dir%/%kernel.environment%.log"
+            level: debug
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    AppBundle\:
+        resource: '../../src/AppBundle/*'
+        exclude: '../../src/AppBundle/{Entity,Repository,Tests}'
+
+    AppBundle\Controller\:
+        resource: '../../src/AppBundle/Controller'
+        tags: ['controller.service_arguments']

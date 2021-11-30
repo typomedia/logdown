@@ -1,0 +1,45 @@
+{
+    "name": "typomedia/logfony",
+    "license": "proprietary",
+    "type": "project",
+    "require": {
+        "php": "^7.2",
+        "doctrine/doctrine-bundle": "^2.0",
+        "doctrine/orm": "^2.7",
+        "symfony/maker-bundle": "^1.36",
+        "symfony/monolog-bundle": "^3.5",
+        "symfony/swiftmailer-bundle": "^3.4",
+        "symfony/symfony": "^4.4",
+        "twig/twig": "^2.14"
+    },
+    "scripts": {
+        "auto-scripts": [
+            "bin/console cache:clear",
+            "bin/console assets:install --symlink --relative web"
+        ],
+        "post-install-cmd": [
+            "@auto-scripts"
+        ],
+        "post-update-cmd": [
+            "@auto-scripts"
+        ]
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "AppBundle\\": "src/AppBundle"
+        },
+        "classmap": [
+            "app/AppKernel.php"
+        ]
+    },
+    "extra": {
+        "symfony-app-dir": "app",
+        "symfony-bin-dir": "bin",
+        "symfony-var-dir": "var",
+        "symfony-web-dir": "web",
+        "symfony-assets-install": "relative"
+    }
+}
