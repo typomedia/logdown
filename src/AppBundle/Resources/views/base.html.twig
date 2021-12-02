@@ -1,19 +1,67 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8" />
-        <title>{% block title %}{{ application.name }}{% endblock %}</title>
-        {% block stylesheets %}
-            <link rel="stylesheet" href="{{ asset('themes/nano/libs/pure/pure-min.css') }}">
-            <link rel="stylesheet/less" href="{{ asset('themes/nano/styles.less') }}">
-        {% endblock %}
-        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
-    </head>
-    <body>
-        {% block body %}
-        {% endblock %}
-        {% block javascripts %}
-            <script type="text/javascript" src="{{ asset('themes/nano/libs/less/less.min.js') }}"></script>
-        {% endblock %}
-    </body>
+<html lang="de">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{{ application.name }}{% endblock %}</title>
+    {% block stylesheets %}
+        <link rel="stylesheet" href="{{ asset('themes/zuse/libs/bootstrap/css/bootstrap.css') }}">
+        <link rel="stylesheet" href="{{ asset('themes/zuse/styles.css') }}">
+        <link rel="icon" type="image/x-icon" href="{{ asset('themes/zuse/favicon.png') }}">
+    {% endblock %}
+</head>
+{% set route = app.request.get('_route') %}
+<body class="{{ route }}">
+<header>
+    <nav class="navbar">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                {#<button type="button" class="navbar-toggle collapsed fa fa-bars hidden-sm hidden-md hidden-lg" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">#}
+                {#<span class="sr-only">Toggle navigation</span>#}
+                {#</button>#}
+                <a class="navbar-brand" href=""><span class="icon-aesculap"></span>{{ application.name }}</a>
+            </div>
+            <form class="navbar-form navbar-right" method="get" action="">
+                <div class="form-group">
+                    <input type="text" name="s" class="form-control" value="" autofocus="autofocus" placeholder="Search...">
+                </div>
+                <button type="submit" class="btn btn-default"><span class="fa fa-search"></span></button>
+            </form>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li class="{% if route starts with 'import' %}active{% endif %}"><a href="#"><span></span>Import</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+<section>
+    {% block body %}
+    {% endblock %}
+</section>
+<footer>
+    <div>
+        <span>&copy; {{ "now"|date("Y") }} Dosing GmbH Heidelberg. <span class="hidden-xs">Handmade with <i class="love">&hearts;</i> by Philipp Speck.</span></span>
+        <span class="pull-right"><span style="font-size: 12pt"></span> {{ application.version }}</span>
+    </div>
+</footer>
+{% block javascripts %}
+    <script src="{{ asset('themes/zuse/js/jquery.slim.js') }}"></script>
+    <script src="{{ asset('themes/zuse/js/tablesorter.js') }}"></script>
+    <script src="{{ asset('themes/zuse/libs/bootstrap/js/bootstrap.min.js') }}"></script>
+    <script>
+        if (!window.localStorage['sf2/profiler/toolbar/displayState']) {
+            window.localStorage['sf2/profiler/toolbar/displayState'] = 'none';
+        }
+        if ($('.sf-minitoolbar').length > 0) {
+            $('section').css('margin-bottom', 0);
+        }
+
+        $('table.table').tablesorter();
+    </script>
+{% endblock %}
+</body>
 </html>
