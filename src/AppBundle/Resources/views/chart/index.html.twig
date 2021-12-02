@@ -1,0 +1,47 @@
+{% extends '@App/base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('themes/nano/libs/chartist/chartist.min.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="content">
+        <div id="1" style="height: 300px" class="ct-chart"></div>
+        <div id="2" style="height: 300px" class="ct-chart time"></div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{ asset('themes/nano/libs/chartist/chartist.min.js') }}"></script>
+    <script>
+        const data = {
+            labels: {{ labels|raw }},
+            series: [
+                {{ number|raw }}
+            ]
+        };
+
+        new Chartist.Line('.ct-chart', data);
+
+        const data2 = {
+            labels: {{ labels|raw }},
+            series: [
+                {{ median|raw }}
+            ]
+        };
+
+        new Chartist.Line('.time', data2);
+    </script>
+    <style>
+        .ct-series-b .ct-line {
+            /* Set the colour of this series line */
+            stroke: darkblue !important;
+            /* Control the thikness of your lines */
+            /*stroke-width: 5px;*/
+            /*!* Create a dashed line with a pattern *!*/
+            /*stroke-dasharray: 10px 20px;*/
+        }
+    </style>
+{% endblock %}

@@ -49,11 +49,15 @@ monolog:
             type: stream
             path: "%kernel.logs_dir%/%kernel.environment%.log"
             level: debug
+
+maker:
+    root_namespace: 'AppBundle'
+
 services:
     _defaults:
         autowire: true
         autoconfigure: true
-        public: false
+        public: true
 
     AppBundle\:
         resource: '../../src/AppBundle/*'
@@ -62,3 +66,6 @@ services:
     AppBundle\Controller\:
         resource: '../../src/AppBundle/Controller'
         tags: ['controller.service_arguments']
+
+    AppBundle\Repository\LogRepository:
+        arguments: ['%kernel.project_dir%']

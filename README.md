@@ -29,3 +29,5 @@ For [PhpStorm](https://www.jetbrains.com/phpstorm/) users install the following 
 
 * [Symfony Plugin](https://plugins.jetbrains.com/plugin/7219-symfony-plugin)
 * [PHP Annotations](https://plugins.jetbrains.com/plugin/7320-php-annotations)
+
+php bin/console doctrine:mapping:import "App\Entity" annotation --path=src/Entity
