@@ -208,49 +208,29 @@ html {
           border-spacing: 0;
           thead {
             background: #eeeeee;
-          }
-          th.actions {
-            width: 180px;
-          }
-          th:after {
-            font-family: 'FontAwesome';
-            content: "\f0dc";
-            font-size: smaller;
-            font-weight: normal;
-            margin-left: 2px;
-          }
-          th.header {
-            cursor: pointer;
-            border-bottom: 0;
+            th {
+              &.header {
+                cursor: pointer;
+                border-bottom: 0;
+              }
+              &.number {
+                text-align: center;
+              }
+              &:after {
+                font-family: 'FontAwesome';
+                content: "\f0dc";
+                font-size: smaller;
+                font-weight: normal;
+                margin-left: 5px;
+              }
+            }
           }
           tbody {
-            td.thumb {
-              vertical-align: middle;
-              img {
-                vertical-align: middle;
-                max-height: 40px;
-                max-width: 40px;
-              }
-              img:hover {
-                -webkit-transform: scale(1.8);
-                -moz-transform: scale(1.8);
-                -o-transform: scale(1.8);
-                -ms-transform: scale(1.8);
-                transform: scale(1.8);
-                -webkit-transform-origin: 50% 50%;
-                -moz-transform-origin: 50% 50%;
-                -o-transform-origin: 50% 50%;
-                -ms-transform-origin: 50% 50%;
-                transform-origin: 50% 50%;
-                -webkit-transition-duration: 0.2s;
-                -moz-transition-duration: 0.2s;
-                -o-transition-duration: 0.2s;
-                transition-duration: 0.2s;
-                -webkit-transition-timing-function: linear;
-                -moz-transition-timing-function: linear;
-                -o-transition-timing-function: linear;
-                transition-timing-function: linear;
-              }
+            td {
+              max-width: 30em;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
             }
             tr:nth-child(even){
               background: rgba(130, 200, 65, .1);
@@ -261,22 +241,30 @@ html {
             td li a.fa:hover {
               .transition();
             }
-            td.file:before {
-              font-family: FontAwesome;
-              margin-right: 10px;
-              content: "\f15b";
+            .avg:before {
+              margin-right: 5px;
+              content: "\d8";
             }
-            td.notes {
-              vertical-align: middle;
-              img {
-                vertical-align: middle;
-                max-height: 38px;
-                max-width: 38px;
-              }
+            .ms:after {
+              margin-left: 5px;
+              content: "ms";
+            }
+            .time:after {
+              font-family: 'FontAwesome';
+              content: "\f017";
+              font-weight: normal;
+              margin-left: 2px;
+            }
+            td.number {
+              text-align: right;
+              margin-right: 20px;
+            }
+            td:last-child {
+              padding-right: 20px;
             }
             ul {
               list-style: none;
-              height: 0px;
+              height: 0;
               li {
                 list-style: none;
                 display: inline;
@@ -311,7 +299,7 @@ html {
         color: white;
         background: rgb(0,130, 200);
         div {
-          margin: 10px 40px 0 10px;
+          margin: 10px 10px 0 10px;
           vertical-align: middle;
           i.love {
             color: @color-third;

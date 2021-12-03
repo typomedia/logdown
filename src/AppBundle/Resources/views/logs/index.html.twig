@@ -1,0 +1,92 @@
+{% extends '@App/base.html.twig' %}
+
+{% block body %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Date</th>
+{#                <th>Time</th>#}
+{#                <th>Server</th>#}
+                <th>Method</th>
+                <th>Request</th>
+                <th>Param</th>
+                <th>Port</th>
+{#                <th>Client</th>#}
+                <th>Status</th>
+                <th class="number">Duration</th>
+                <th class="number">Count</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for log in logs %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>
+                    <a href="{{ path('app_chart_chart', {
+                        'request': log.Request,
+                        'param': log.Param,
+                        'date': log.Month|date('Y-m')
+                    }) }}">
+                        <span class="fa fa-area-chart"></span>
+                    &ensp;{{ log.Month ? log.Month|date('Y-m') : '' }}
+                    </a>
+                </td>
+{#                <td>{{ log.Time ? log.Time|date('H:i:s') : '' }}</td>#}
+{#                <td>{{ log.Server }}</td>#}
+                <td>
+                    {% set label = 'primary' %}
+                    {% if log.Method == 'GET' %}
+                        {% set label = 'success' %}
+                    {% endif %}
+                    <span class="label label-{{ label }}">
+                    {{ log.Method }}
+                    </span>
+                </td>
+                <td>
+                    <a href="{{ path('logs_search', {
+                        'request': log.Request,
+                        'param': log.Param,
+                        'date': log.Month|date('Y-m')
+                    }) }}">
+                        <span class="fa fa-search"></span>
+                    &ensp;{{ log.Request }}
+                    </a>
+                </td>
+                <td title="{{ log.Param }}">{{ log.Param }}</td>
+                {% if log.Port == '443' %}
+                    <td><span class="label label-success"><i class="fa fa-lock"></i>&ensp;{{ log.Port }}</span></td>
+                {% else %}
+                    <td><span class="label label-default"><i class="fa fa-unlock"></i>&ensp;{{ log.Port }}</span></td>
+                {% endif %}
+{#                <td>{{ log.Client }}</td>#}
+                <td>
+                    {% set label = 'default' %}
+                    {% if log.Status == '200' %}
+                        {% set label = 'success' %}
+                    {% endif %}
+                    {% if log.Status == '500' %}
+                        {% set label = 'danger' %}
+                    {% endif %}
+                    <span class="label label-{{ label }}">
+                        {{ log.Status }}
+                    </span>
+                </td>
+                <td class="number">
+                    <span class="avg ms">{{ log.Duration|round }}</span>
+                </td>
+                <td class="number">{{ log.Number }}&ensp;<span class="fa fa-bullseye"></span></td>
+{#                <td>#}
+{#                    <a href="{{ path('logs_show', {'id': log.id}) }}">show</a>#}
+{#                    <a href="{{ path('logs_edit', {'id': log.id}) }}">edit</a>#}
+{#                </td>#}
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="17">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

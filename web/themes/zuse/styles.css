@@ -150,47 +150,25 @@ html body > section table {
 html body > section table thead {
   background: #eeeeee;
 }
-html body > section table th.actions {
-  width: 180px;
+html body > section table thead th.header {
+  cursor: pointer;
+  border-bottom: 0;
 }
-html body > section table th:after {
+html body > section table thead th.number {
+  text-align: center;
+}
+html body > section table thead th:after {
   font-family: 'FontAwesome';
   content: "\f0dc";
   font-size: smaller;
   font-weight: normal;
-  margin-left: 2px;
+  margin-left: 5px;
 }
-html body > section table th.header {
-  cursor: pointer;
-  border-bottom: 0;
-}
-html body > section table tbody td.thumb {
-  vertical-align: middle;
-}
-html body > section table tbody td.thumb img {
-  vertical-align: middle;
-  max-height: 40px;
-  max-width: 40px;
-}
-html body > section table tbody td.thumb img:hover {
-  -webkit-transform: scale(1.8);
-  -moz-transform: scale(1.8);
-  -o-transform: scale(1.8);
-  -ms-transform: scale(1.8);
-  transform: scale(1.8);
-  -webkit-transform-origin: 50% 50%;
-  -moz-transform-origin: 50% 50%;
-  -o-transform-origin: 50% 50%;
-  -ms-transform-origin: 50% 50%;
-  transform-origin: 50% 50%;
-  -webkit-transition-duration: 0.2s;
-  -moz-transition-duration: 0.2s;
-  -o-transition-duration: 0.2s;
-  transition-duration: 0.2s;
-  -webkit-transition-timing-function: linear;
-  -moz-transition-timing-function: linear;
-  -o-transition-timing-function: linear;
-  transition-timing-function: linear;
+html body > section table tbody td {
+  max-width: 30em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 html body > section table tbody tr:nth-child(even) {
   background: rgba(130, 200, 65, 0.1);
@@ -218,22 +196,30 @@ html body > section table tbody td li a.fa:hover {
   -o-transition-timing-function: linear;
   transition-timing-function: linear;
 }
-html body > section table tbody td.file:before {
-  font-family: FontAwesome;
-  margin-right: 10px;
-  content: "\f15b";
+html body > section table tbody .avg:before {
+  margin-right: 5px;
+  content: "\d8";
 }
-html body > section table tbody td.notes {
-  vertical-align: middle;
+html body > section table tbody .ms:after {
+  margin-left: 5px;
+  content: "ms";
 }
-html body > section table tbody td.notes img {
-  vertical-align: middle;
-  max-height: 38px;
-  max-width: 38px;
+html body > section table tbody .time:after {
+  font-family: 'FontAwesome';
+  content: "\f017";
+  font-weight: normal;
+  margin-left: 2px;
+}
+html body > section table tbody td.number {
+  text-align: right;
+  margin-right: 20px;
+}
+html body > section table tbody td:last-child {
+  padding-right: 20px;
 }
 html body > section table tbody ul {
   list-style: none;
-  height: 0px;
+  height: 0;
 }
 html body > section table tbody ul li {
   list-style: none;
@@ -270,7 +256,7 @@ html body footer {
   background: #0082c8;
 }
 html body footer div {
-  margin: 10px 40px 0 10px;
+  margin: 10px 10px 0 10px;
   vertical-align: middle;
 }
 html body footer div i.love {

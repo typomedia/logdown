@@ -17,6 +17,7 @@ class LogRepository
     public function __construct($path)
     {
         $this->path = $path . '/var/scripts/';
+
     }
 
     /**

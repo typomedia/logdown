@@ -1,7 +1,9 @@
 parameters:
     locale: de
+    lifetime: 3600
+    cache: true
     application:
-        name: logfony
+        name: Logdown
         version: 1.0.0
         company: typomedia
         author: Philipp Speck
@@ -18,7 +20,7 @@ framework:
         enabled: '%kernel.debug%'
 
 web_profiler:
-    toolbar: true
+    toolbar: false
     intercept_redirects: false
 
 twig:

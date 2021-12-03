@@ -8,7 +8,7 @@
     {% block stylesheets %}
         <link rel="stylesheet" href="{{ asset('themes/zuse/libs/bootstrap/css/bootstrap.css') }}">
         <link rel="stylesheet" href="{{ asset('themes/zuse/styles.css') }}">
-        <link rel="icon" type="image/x-icon" href="{{ asset('themes/zuse/favicon.png') }}">
+{#        <link rel="icon" type="image/x-icon" href="{{ asset('themes/zuse/favicon.png') }}">#}
     {% endblock %}
 </head>
 {% set route = app.request.get('_route') %}
@@ -16,25 +16,22 @@
 <header>
     <nav class="navbar">
         <div class="container-fluid">
-            <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
-                {#<button type="button" class="navbar-toggle collapsed fa fa-bars hidden-sm hidden-md hidden-lg" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">#}
-                {#<span class="sr-only">Toggle navigation</span>#}
-                {#</button>#}
-                <a class="navbar-brand" href=""><span class="icon-aesculap"></span>{{ application.name }}</a>
+                <a class="navbar-brand" href="{{ path('logs_index') }}"><span class="fa fa-wpexplorer"></span>&ensp;{{ application.name }}</a>
             </div>
-            <form class="navbar-form navbar-right" method="get" action="">
+            <form class="navbar-form navbar-right" method="get" action="{{ path('logs_index') }}">
                 <div class="form-group">
-                    <input type="text" name="s" class="form-control" value="" autofocus="autofocus" placeholder="Search...">
+                    <label>
+                        <input type="text" name="search" class="form-control" value="" autofocus="autofocus" placeholder="Search...">
+                    </label>
                 </div>
                 <button type="submit" class="btn btn-default"><span class="fa fa-search"></span></button>
             </form>
-            <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav">
-                    <li class="{% if route starts with 'import' %}active{% endif %}"><a href="#"><span></span>Import</a></li>
-                </ul>
-            </div>
+{#            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">#}
+{#                <ul class="nav navbar-nav">#}
+{#                    <li class="{% if route starts with 'import' %}active{% endif %}"><a href="#"><span></span>Import</a></li>#}
+{#                </ul>#}
+{#            </div>#}
         </div>
     </nav>
 </header>
@@ -45,12 +42,13 @@
 <footer>
     <div>
         <span>&copy; {{ "now"|date("Y") }} Dosing GmbH Heidelberg. <span class="hidden-xs">Handmade with <i class="love">&hearts;</i> by Philipp Speck.</span></span>
-        <span class="pull-right"><span style="font-size: 12pt"></span> {{ application.version }}</span>
+        <span class="pull-right"><span style="font-size: 12pt"></span>Version {{ application.version }}</span>
     </div>
 </footer>
 {% block javascripts %}
     <script src="{{ asset('themes/zuse/js/jquery.slim.js') }}"></script>
     <script src="{{ asset('themes/zuse/js/tablesorter.js') }}"></script>
+    <script src="https://mottie.github.io/tablesorter/js/parsers/parser-date-month.js"></script>
     <script src="{{ asset('themes/zuse/libs/bootstrap/js/bootstrap.min.js') }}"></script>
     <script>
         if (!window.localStorage['sf2/profiler/toolbar/displayState']) {
@@ -60,7 +58,12 @@
             $('section').css('margin-bottom', 0);
         }
 
-        $('table.table').tablesorter();
+        $('table.table').tablesorter({
+            dateFormat : "yyyy mm"
+        });
+
+        //$('table.table').tablesorter();
+
     </script>
 {% endblock %}
 </body>

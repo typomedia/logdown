@@ -41,13 +41,20 @@ class ChartController extends AbstractController
     }
 
     /**
-     * @Route("/chart/{year}/{month}")
+     * @Route("/chart")
      * @throws Exception|\Doctrine\DBAL\Driver\Exception
      * @throws \Psr\Cache\InvalidArgumentException
+     * @throws \Exception
      */
-    public function chartAction(Request $request, int $year, string $month): Response
+    public function chartAction(Request $request): Response
     {
-        $sql = $this->repo->getContent('Requests.sql');
+        $url = trim($request->query->get('request'));
+        $param = trim($request->query->get('param'));
+        $date = trim($request->query->get('date'));
+
+        $sql = $this->repo->getContent('Chart.sql');
+
+        //$configDirectories = [__DIR__.'../Queries/Chart.sql'];
 
 //        $logs = $entityManager
 //            ->getConnection()
@@ -57,12 +64,11 @@ class ChartController extends AbstractController
         $stmt = $this->entity
             ->getConnection()
             ->prepare($sql);
-        //$stmt->bindValue('request', '/VigieTextofPZN.php');
-        //$stmt->bindValue('request', '/schnittstellen/webservices/index.php');
-        $stmt->bindValue('request', $request->query->get('request'));
-        $stmt->bindValue('date', "$year-$month-%");
+        $stmt->bindValue('request', $url);
+        $stmt->bindValue('param', $param);
+        $stmt->bindValue('date', "$date%");
 
-        $key = md5($sql . $year . $month . $request->query->get('request'));
+        $key = md5($sql . serialize($request->query->all()));
 
         $item = $this->cache->getItem($key);
 
