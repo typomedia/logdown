@@ -2,11 +2,13 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('themes/nano/libs/chartist/chartist.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('themes/zuse/libs/chartist/chartist.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('themes/zuse/libs/chartist/plugins/chartist-plugin-tooltip.css') }}">
 {% endblock %}
 
 {% block body %}
-    <div class="content" style="padding-top: 10px">
+    <div class="content" style="padding: 5px 20px">
+        <h1>Request: <code>{{ app.request.query.get('request') }}?{{ app.request.query.get('param') }}</code></h1>
         <div id="1" style="height: 280px" class="ct-chart"></div>
         <div id="2" style="height: 280px" class="ct-chart time"></div>
     </div>
@@ -14,7 +16,9 @@
 
 {% block javascripts %}
     {{ parent() }}
-    <script type="text/javascript" src="{{ asset('themes/nano/libs/chartist/chartist.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('themes/zuse/libs/chartist/chartist.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('themes/zuse/libs/chartist/plugins/chartist-plugin-pointlabels.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('themes/zuse/libs/chartist/plugins/chartist-plugin-tooltip.min.js') }}"></script>
     <script>
         new Chartist.Line('.ct-chart', {
             labels: {{ labels|raw }},
@@ -22,10 +26,12 @@
                 {{ number|raw }}
             ]
         }, {
-            low: 0,
             showArea: true,
-            showPoint: true,
-            fullWidth: true
+            plugins: [
+                Chartist.plugins.ctPointLabels({
+                    textAnchor: 'middle'
+                })
+            ]
         });
 
         new Chartist.Line('.time', {
@@ -34,19 +40,13 @@
                 {{ median|raw }}
             ]
         }, {
-            low: 0,
-            showArea: true
+            showArea: true,
+            plugins: [
+                // Chartist.plugins.tooltip(),
+                Chartist.plugins.ctPointLabels({
+                    textAnchor: 'middle'
+                })
+            ]
         });
-
     </script>
-    <style>
-        .ct-series-b .ct-line {
-            /* Set the colour of this series line */
-            stroke: darkblue !important;
-            /* Control the thikness of your lines */
-            /*stroke-width: 5px;*/
-            /*!* Create a dashed line with a pattern *!*/
-            /*stroke-dasharray: 10px 20px;*/
-        }
-    </style>
 {% endblock %}

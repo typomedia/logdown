@@ -58,6 +58,9 @@
   cursor: not-allowed;
 }
 
+h1 {
+  font-size: 12pt;
+}
 
 .btn {
   border-radius: 0;
@@ -309,6 +312,26 @@ html {
     }
   }
 
+svg:not(:root) {
+  overflow: unset !important;
+}
+
+svg {
+  text {
+    &.ct-label {
+      opacity: 0;
+    }
+  }
+  line {
+    &.ct-point {
+      cursor: pointer;
+      &:hover + .ct-label {
+        opacity: 1;
+        font-size: 1.2rem;
+      }
+    }
+  }
+}
 
 span.thumb {
   img {

@@ -70,4 +70,4 @@ services:
         tags: ['controller.service_arguments']
 
     AppBundle\Repository\LogRepository:
-        arguments: ['%kernel.project_dir%']
+        arguments: ['@doctrine.orm.entity_manager', '@parameter_bag']

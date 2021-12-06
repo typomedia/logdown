@@ -5,6 +5,9 @@
 .readonly {
   cursor: not-allowed;
 }
+h1 {
+  font-size: 12pt;
+}
 .btn {
   border-radius: 0;
 }
@@ -262,6 +265,19 @@ html body footer div {
 html body footer div i.love {
   color: #d1dc29;
 }
+svg:not(:root) {
+  overflow: unset !important;
+}
+svg text.ct-label {
+  opacity: 0;
+}
+svg line.ct-point {
+  cursor: pointer;
+}
+svg line.ct-point:hover + .ct-label {
+  opacity: 1;
+  font-size: 1.2rem;
+}
 span.thumb img {
   vertical-align: middle;
   max-height: 32px;
@@ -315,3 +331,4 @@ h3 {
   background: none;
   border: none;
 }
+/*# sourceMappingURL=styles.css.map */

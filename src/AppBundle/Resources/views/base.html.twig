@@ -46,9 +46,8 @@
     </div>
 </footer>
 {% block javascripts %}
-    <script src="{{ asset('themes/zuse/js/jquery.slim.js') }}"></script>
+    <script src="{{ asset('themes/zuse/libs/jquery/jquery.min.js') }}"></script>
     <script src="{{ asset('themes/zuse/js/tablesorter.js') }}"></script>
-    <script src="https://mottie.github.io/tablesorter/js/parsers/parser-date-month.js"></script>
     <script src="{{ asset('themes/zuse/libs/bootstrap/js/bootstrap.min.js') }}"></script>
     <script>
         if (!window.localStorage['sf2/profiler/toolbar/displayState']) {
@@ -58,12 +57,7 @@
             $('section').css('margin-bottom', 0);
         }
 
-        $('table.table').tablesorter({
-            dateFormat : "yyyy mm"
-        });
-
-        //$('table.table').tablesorter();
-
+        $('table.table').tablesorter();
     </script>
 {% endblock %}
 </body>

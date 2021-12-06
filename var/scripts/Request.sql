@@ -1,5 +1,5 @@
 select
-    Date,
+    strftime("%Y-%m", Date) as Month,
        Method,
        Request,
        Param,
@@ -8,8 +8,8 @@ select
        avg(Duration) as Duration,
        count(*)      as Number
 from Logs
-where Request = :request
-  and Param = :param
-and Date like :date
-group by Date, Method, Request, Param, Port, Status
-order by Date desc, Number desc;
+where (Request like :search
+   or Param like :search)
+group by Month, Method, Request, Param, Port, Status
+order by Month desc, Number desc
+    limit 100;
