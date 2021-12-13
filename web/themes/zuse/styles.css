@@ -6,7 +6,8 @@
   cursor: not-allowed;
 }
 h1 {
-  font-size: 12pt;
+  font-size: 14pt;
+  font-weight: bold;
 }
 .btn {
   border-radius: 0;
@@ -199,20 +200,6 @@ html body > section table tbody td li a.fa:hover {
   -o-transition-timing-function: linear;
   transition-timing-function: linear;
 }
-html body > section table tbody .avg:before {
-  margin-right: 5px;
-  content: "\d8";
-}
-html body > section table tbody .ms:after {
-  margin-left: 5px;
-  content: "ms";
-}
-html body > section table tbody .time:after {
-  font-family: 'FontAwesome';
-  content: "\f017";
-  font-weight: normal;
-  margin-left: 2px;
-}
 html body > section table tbody td.number {
   text-align: right;
   margin-right: 20px;
@@ -303,8 +290,28 @@ span.thumb img {
 .lighter {
   color: #666666;
 }
-h3 {
-  color: #283c46;
+.right {
+  text-align: right;
+}
+.parent {
+  display: flex;
+}
+.left,
+.right {
+  flex: 1;
+}
+.center {
+  text-align: center;
+  display: block;
+  margin: 0 auto;
+}
+.avg:before {
+  margin-right: 5px;
+  content: "\d8";
+}
+.ms:after {
+  margin-left: 5px;
+  content: "ms";
 }
 @media (min-width: 768px) {
   div.collapse {

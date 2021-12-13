@@ -59,7 +59,8 @@
 }
 
 h1 {
-  font-size: 12pt;
+  font-size: 14pt;
+  font-weight: bold;
 }
 
 .btn {
@@ -190,9 +191,6 @@ html {
         a:link, a:hover, a:visited {
           color: rgb(40, 60, 70);
         }
-        h2 {
-          //margin-left: 0.5em;
-        }
         li {
           margin-left: 1em;
         }
@@ -243,20 +241,6 @@ html {
             }
             td li a.fa:hover {
               .transition();
-            }
-            .avg:before {
-              margin-right: 5px;
-              content: "\d8";
-            }
-            .ms:after {
-              margin-left: 5px;
-              content: "ms";
-            }
-            .time:after {
-              font-family: 'FontAwesome';
-              content: "\f017";
-              font-weight: normal;
-              margin-left: 2px;
             }
             td.number {
               text-align: right;
@@ -362,8 +346,30 @@ span.thumb {
   color: #666666;
 }
 
-h3 {
-  color: #283c46;
+.right {
+  text-align: right;
+}
+.parent {
+  display: flex;
+}
+.left, .right {
+  flex: 1;
+}
+
+
+.center {
+  text-align: center;
+  display: block;
+  margin: 0 auto;
+}
+
+.avg:before {
+  margin-right: 5px;
+  content: "\d8";
+}
+.ms:after {
+  margin-left: 5px;
+  content: "ms";
 }
 
 @media (min-width: 768px) {
