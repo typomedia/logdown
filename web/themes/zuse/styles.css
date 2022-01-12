@@ -1,23 +1,12 @@
 @import "libs/bootstrap/css/bootstrap.min.css";
 @import "fonts/FontAwesome/css/font-awesome.min.css";
 @import "fonts/PTSans/PTS55F_stylesheet.css";
-@import "fonts/iconmoon/iconmoon.css";
-.readonly {
-  cursor: not-allowed;
-}
-h1 {
-  font-size: 14pt;
-  font-weight: bold;
-}
 .btn {
   border-radius: 0;
 }
 .form-control,
 .input-group .form-control {
   border-radius: 0;
-}
-.navbar {
-  min-height: 40px;
 }
 .nav > li > a:focus,
 .nav > li > a:hover {
@@ -32,7 +21,7 @@ html {
   height: 100%;
 }
 html body {
-  font-family: 'PTSansRegular';
+  font-family: 'PTSansRegular', serif;
   height: 100%;
 }
 html body > header {
@@ -41,37 +30,12 @@ html body > header {
   position: fixed;
   z-index: 10;
 }
-html body > header .search-bar {
-  margin: 5px 40px 2px;
-  float: right;
-}
 html body > header nav.navbar {
   height: 50px;
   background: #0e94d2;
   border-radius: 0;
   border: none;
   margin-bottom: 0;
-  /*
-          img.navbar-brand:hover {
-            background: #194272;
-            -webkit-transition: all 2s ease-out;
-            -ms-transition: all 2s ease-out;
-            -o-transition: all 2s ease-out;
-            transition: all 2s ease-out;
-          }
-          .navbar-left > li {
-            border-right: 1px solid #333333;
-          }
-          .navbar-right > li {
-            border-left: 1px solid #333333;
-          }
-          nav > li > a:focus, .nav > li > a:hover {
-            background: none;
-          }
-          ul.navbar-right img {
-            vertical-align: top;
-            margin: -15px -35px 0 20px
-          }*/
 }
 html body > header nav.navbar div.collapse {
   background: gray;
@@ -87,12 +51,6 @@ html body > header nav.navbar ul.nav li.active a {
 html body > header nav.navbar a.navbar-brand {
   color: white;
   background: #82c841;
-}
-html body > header nav.navbar button.navbar-toggle {
-  width: 40px;
-  height: 34px;
-  color: white;
-  border: 1px solid white;
 }
 html body > header nav.navbar form input {
   background: rgba(0, 0, 0, 0.2);
@@ -114,8 +72,8 @@ html body > header nav.navbar form button {
   border: 0;
   height: 34px;
   position: absolute;
-  top: 0px;
-  right: 0px;
+  top: 0;
+  right: 0;
 }
 html body ul.area {
   list-style: none;
@@ -133,18 +91,6 @@ html body > section a:link,
 html body > section a:hover,
 html body > section a:visited {
   color: #283c46;
-}
-html body > section li {
-  margin-left: 1em;
-}
-html body > section div.icons {
-  margin-top: 20px;
-}
-html body > section div.icons > span {
-  margin-left: 0.1em;
-}
-html body > section div.icons > span:before {
-  font-size: 1.8em;
 }
 html body > section table {
   margin: 0;
@@ -180,26 +126,6 @@ html body > section table tbody tr:nth-child(even) {
 html body > section table tbody tr:hover {
   background: rgba(14, 150, 210, 0.1);
 }
-html body > section table tbody td li a.fa:hover {
-  -webkit-transform: scale(1.4);
-  -moz-transform: scale(1.4);
-  -o-transform: scale(1.4);
-  -ms-transform: scale(1.4);
-  transform: scale(1.4);
-  -webkit-transform-origin: 50% 50%;
-  -moz-transform-origin: 50% 50%;
-  -o-transform-origin: 50% 50%;
-  -ms-transform-origin: 50% 50%;
-  transform-origin: 50% 50%;
-  -webkit-transition-duration: 0.2s;
-  -moz-transition-duration: 0.2s;
-  -o-transition-duration: 0.2s;
-  transition-duration: 0.2s;
-  -webkit-transition-timing-function: linear;
-  -moz-transition-timing-function: linear;
-  -o-transition-timing-function: linear;
-  transition-timing-function: linear;
-}
 html body > section table tbody td.number {
   text-align: right;
   margin-right: 20px;
@@ -207,35 +133,18 @@ html body > section table tbody td.number {
 html body > section table tbody td:last-child {
   padding-right: 20px;
 }
-html body > section table tbody ul {
-  list-style: none;
-  height: 0;
+html body > section svg:not(:root) {
+  overflow: unset !important;
 }
-html body > section table tbody ul li {
-  list-style: none;
-  display: inline;
-  margin-left: 10px;
+html body > section svg text.ct-label {
+  opacity: 0;
 }
-html body ul.nav-tabs {
-  border-bottom: none;
+html body > section svg line.ct-point {
+  cursor: pointer;
 }
-html body ul.nav-tabs li {
-  color: white;
-}
-html body ul.nav-tabs li a:link,
-html body ul.nav-tabs li a:hover,
-html body ul.nav-tabs li a:visited {
-  color: white;
-  border-radius: 0;
-}
-html body ul.nav-tabs li.active {
-  color: white;
-}
-html body ul.nav-tabs li.active a:link,
-html body ul.nav-tabs li.active a:hover,
-html body ul.nav-tabs li.active a:visited {
-  color: white;
-  background: #506478;
+html body > section svg line.ct-point:hover + .ct-label {
+  opacity: 1;
+  font-size: 1.2rem;
 }
 html body footer {
   position: fixed;
@@ -251,41 +160,6 @@ html body footer div {
 }
 html body footer div i.love {
   color: #d1dc29;
-}
-svg:not(:root) {
-  overflow: unset !important;
-}
-svg text.ct-label {
-  opacity: 0;
-}
-svg line.ct-point {
-  cursor: pointer;
-}
-svg line.ct-point:hover + .ct-label {
-  opacity: 1;
-  font-size: 1.2rem;
-}
-span.thumb img {
-  vertical-align: middle;
-  max-height: 32px;
-  max-width: 32px;
-  margin: -8px 10px 0 0;
-}
-.nav-tabs > li > a,
-.nav-tabs > li > a:focus {
-  color: white;
-  background: #868686;
-  border: none;
-}
-.nav-tabs > li > a:hover {
-  background: #00aab4;
-}
-.nav-tabs > li.active > a,
-.nav-tabs > li.active > a:focus,
-.nav-tabs > li.active > a:hover {
-  color: white;
-  background: #868686;
-  border: none;
 }
 .lighter {
   color: #666666;
@@ -313,17 +187,6 @@ span.thumb img {
   margin-left: 5px;
   content: "ms";
 }
-@media (min-width: 768px) {
-  div.collapse {
-    background: none !important;
-  }
-  div.collapse ul.nav li.active {
-    border-bottom: 4px solid rgba(0, 0, 0, 0.2);
-  }
-  .navbar-form .form-control {
-    width: 310px;
-  }
-}
 .navbar-form {
   padding: 0;
   margin: 0;
@@ -337,5 +200,16 @@ span.thumb img {
   color: white;
   background: none;
   border: none;
+}
+@media (min-width: 768px) {
+  div.collapse {
+    background: none !important;
+  }
+  div.collapse ul.nav li.active {
+    border-bottom: 4px solid rgba(0, 0, 0, 0.2);
+  }
+  .navbar-form .form-control {
+    width: 310px;
+  }
 }
 /*# sourceMappingURL=styles.css.map */
