@@ -6,12 +6,15 @@
         "php": "^7.2",
         "doctrine/doctrine-bundle": "^2.0",
         "doctrine/orm": "^2.7",
-        "sensio/framework-extra-bundle": "^6.2",
         "symfony/monolog-bundle": "^3.5",
-        "symfony/swiftmailer-bundle": "^3.4",
         "symfony/symfony": "^4.4",
         "twig/twig": "^2.14",
-      "ext-json": "*"
+        "typomedia/sysinfo": "^1.0",
+        "ext-json": "*"
+    },
+    "require-dev": {
+        "symfony/maker-bundle": "^1.36",
+        "sensio/framework-extra-bundle": "^6.2"
     },
     "scripts": {
         "auto-scripts": [
@@ -23,6 +26,14 @@
         ],
         "post-update-cmd": [
             "@auto-scripts"
+        ],
+        "test": [
+            "phpcs --standard=PSR1,PSR12 --error-severity=1 --warning-severity=8 src",
+            "phpstan analyse --no-progress --level 2 src",
+            "phpmd src text codesize, controversial, design, naming, unusedcode"
+        ],
+        "fix": [
+            "phpcbf --standard=PSR1,PSR12 src"
         ]
     },
     "config": {
@@ -42,8 +53,5 @@
         "symfony-var-dir": "var",
         "symfony-web-dir": "web",
         "symfony-assets-install": "relative"
-    },
-    "require-dev": {
-        "symfony/maker-bundle": "^1.36"
     }
 }
