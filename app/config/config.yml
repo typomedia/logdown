@@ -1,7 +1,8 @@
+imports:
+    - resource: param.yml
+
 parameters:
     locale: de
-    lifetime: 3600
-    cache: true
     application:
         name: Logdown
         version: 1.0.0
@@ -12,7 +13,7 @@ framework:
     session: ~
     default_locale:  "%locale%"
     translator:      { fallbacks: ["%locale%"] }
-    secret: CHANGEME
+    secret: '%secret%'
     router:
         resource: '%kernel.root_dir%/config/routing.yml'
     assets: ~
@@ -20,7 +21,7 @@ framework:
         enabled: '%kernel.debug%'
 
 web_profiler:
-    toolbar: false
+    toolbar: '%toolbar%'
     intercept_redirects: false
 
 twig:
