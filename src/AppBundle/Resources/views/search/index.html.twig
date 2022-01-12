@@ -6,7 +6,6 @@
             <tr>
                 <th>#</th>
                 <th>Date</th>
-{#                <th>Time</th>#}
 {#                <th>Server</th>#}
                 <th>Method</th>
                 <th>Request</th>
@@ -15,7 +14,7 @@
 {#                <th>Client</th>#}
                 <th>Status</th>
                 <th class="number">Duration</th>
-                <th class="number">Count</th>
+                <th class="number">Hits</th>
             </tr>
         </thead>
         <tbody>
@@ -25,65 +24,84 @@
                     {{ loop.index }}
                 </td>
                 <td>
+                    {% if view == 'day' %}
+                        <a href="{{ path('app_chart_chart', {
+                            'request': log.request,
+                            'param': log.param,
+                            'status': log.status,
+                            'date': log.datetime|date('Y-m-d H')
+                        }) }}">
+                            <span class="fa fa-area-chart"></span>
+                            &ensp;{{ log.datetime ? log.datetime : '' }}
+                        </a>
+                {% else %}
                     <a href="{{ path('app_chart_chart', {
-                        'request': log.Request,
-                        'param': log.Param,
-                        'date': log.Date|date('Y-m-d')
+                        'request': log.request,
+                        'param': log.param,
+                        'status': log.status,
+                        'date': log.datetime|date('Y-m-d')
                     }) }}">
                         <span class="fa fa-area-chart"></span>
-                    &ensp;{{ log.Date ? log.Date : '' }}
+                        &ensp;{{ log.datetime ? log.datetime : '' }}
                     </a>
+                {% endif %}
                 </td>
-{#                <td>{{ log.Time ? log.Time|date('H:i:s') : '' }}</td>#}
-{#                <td>{{ log.Server }}</td>#}
+{#                <td>{{ log.server }}</td>#}
                 <td>
                     {% set label = 'primary' %}
-                    {% if log.Method == 'GET' %}
+                    {% if log.method == 'GET' %}
                         {% set label = 'success' %}
                     {% endif %}
                     <span class="label label-{{ label }}">
-                    {{ log.Method }}
+                    {{ log.method }}
                     </span>
                 </td>
                 <td>
-                    <a href="{{ path('logs_search', {
-                        'request': log.Request,
-                        'param': log.Param,
-                        'date': log.Date|date('Y-m-d')
-                    }) }}">
-                        <span class="fa fa-search"></span>
-                    &ensp;{{ log.Request }}
-                    </a>
+                    {% if view == 'day' %}
+                        <a href="{{ path('logs_search', {
+                            'request': log.request,
+                            'param': log.param,
+                            'date': log.datetime|date('Y-m-d H')
+                        }) }}">
+                            <span class="fa fa-search"></span>
+                            &ensp;{{ log.request }}
+                        </a>
+                    {% else %}
+                        <a href="{{ path('logs_search', {
+                            'request': log.request,
+                            'param': log.param,
+                            'date': log.datetime|date('Y-m-d')
+                        }) }}">
+                            <span class="fa fa-search"></span>
+                            &ensp;{{ log.request }}
+                        </a>
+                    {% endif %}
                 </td>
-                <td title="{{ log.Param }}">
-                    {{ log.Param }}
+                <td title="{{ log.param }}">
+                    {{ log.param }}
                 </td>
-                {% if log.Port == '443' %}
-                    <td><span class="label label-success"><i class="fa fa-lock"></i>&ensp;{{ log.Port }}</span></td>
+                {% if log.port == '443' %}
+                    <td><span class="label label-success"><i class="fa fa-lock"></i>&ensp;{{ log.port }}</span></td>
                 {% else %}
-                    <td><span class="label label-default"><i class="fa fa-unlock"></i>&ensp;{{ log.Port }}</span></td>
+                    <td><span class="label label-default"><i class="fa fa-unlock"></i>&ensp;{{ log.port }}</span></td>
                 {% endif %}
-{#                <td>{{ log.Client }}</td>#}
+{#                <td>{{ log.client }}</td>#}
                 <td>
                     {% set label = 'default' %}
-                    {% if log.Status == '200' %}
+                    {% if log.status == '200' %}
                         {% set label = 'success' %}
                     {% endif %}
-                    {% if log.Status == '500' %}
+                    {% if log.status == '500' %}
                         {% set label = 'danger' %}
                     {% endif %}
                     <span class="label label-{{ label }}">
-                        {{ log.Status }}
+                        {{ log.status }}
                     </span>
                 </td>
                 <td class="number">
-                    <span class="avg ms">{{ log.Duration|round }}</span>
+                    <span class="avg ms">{{ log.duration|round }}</span>
                 </td>
-                <td class="number">{{ log.Number }}&ensp;<span class="fa fa-bullseye"></span></td>
-{#                <td>#}
-{#                    <a href="{{ path('logs_show', {'id': log.id}) }}">show</a>#}
-{#                    <a href="{{ path('logs_edit', {'id': log.id}) }}">edit</a>#}
-{#                </td>#}
+                <td class="number">{{ log.number }}&ensp;<span class="fa fa-bullseye"></span></td>
             </tr>
         {% else %}
             <tr>

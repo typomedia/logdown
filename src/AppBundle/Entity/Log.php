@@ -5,12 +5,12 @@ namespace AppBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Logs
+ * Log
  *
- * @ORM\Table(name="Logs")
+ * @ORM\Table(name="Log")
  * @ORM\Entity
  */
-class Logs
+class Log
 {
     /**
      * @var int|null
@@ -27,13 +27,6 @@ class Logs
      * @ORM\Column(name="Date", type="date", nullable=true)
      */
     private $date;
-
-    /**
-     * @var \DateTime|null
-     *
-     * @ORM\Column(name="Time", type="time", nullable=true)
-     */
-    private $time;
 
     /**
      * @var string|null
@@ -310,6 +303,4 @@ class Logs
 
         return $this;
     }
-
-
 }

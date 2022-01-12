@@ -2,16 +2,24 @@
 
 namespace AppBundle\Repository;
 
+use AppBundle\AppBundle;
+use AppBundle\Helper\DateHelper;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Cache\InvalidArgumentException;
+use ReflectionClass;
+use ReflectionException;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Cache\CacheInterface;
 
 class LogRepository
 {
+    public const FETCH_ALL = 0;
+    public const FETCH_ONE = 1;
+
     /**
      * @var string $path
      */
@@ -31,86 +39,43 @@ class LogRepository
      * @var ParameterBag
      */
     private $param;
+    /**
+     * @var RequestStack
+     */
+    private $request;
 
     public function __construct(
         EntityManagerInterface $entity,
         ParameterBag $param,
-        CacheInterface $cache)
-    {
+        RequestStack $request,
+        CacheInterface $cache
+    ) {
         $this->entity = $entity;
         $this->cache = $cache;
         $this->param = $param;
-        $this->path = dirname(__DIR__, 3) . '/var/scripts/';
-
-    }
-
-    /**
-     * @param $name
-     * @return false|string
-     */
-    public function getContent($name) {
-        return file_get_contents($this->path . $name);
-    }
-
-    /**
-     * @param $file
-     * @return array|mixed
-     */
-    public function getVariables($file) {
-        $pattern = '/\s:(\w*)\s/';
-        preg_match_all($pattern, $this->getContent($file), $matches);
-
-        return $matches[1] ?? [];
-    }
-
-    /**
-     * @param array $assoc
-     * @param array $list
-     * @return array
-     */
-    public function filter(array $assoc, array $list) {
-        $data = [];
-        foreach ($list as $value) {
-            $data[$value] = $assoc[$value] ?? '';
-        }
-        return $data;
-    }
-
-    /**
-     * @param array $assoc
-     * @param array $numeric
-     * @return array
-     */
-    public function filter3(array $assoc, array $numeric) {
-        return array_intersect_key($assoc, array_flip($numeric));
-    }
-
-    public function filter2($array, $allowed) {
-        return array_filter(
-            $array,
-                static function ($key) use ($allowed) {
-                    return in_array($key, $allowed, true);
-                },
-                ARRAY_FILTER_USE_KEY
-            );
+        $this->request = $request;
+        $this->path = __DIR__ . '/Queries/';
     }
 
     /**
      * @param string $name
-     * @param Request $request
+     * @param int $mode [optional]
+     * {@see FETCH_ALL} Fetch all assoc
+     * {@see FETCH_ONE} Fetch one assoc
      * @return array|false|mixed
-     * @throws \Doctrine\DBAL\Driver\Exception
      * @throws Exception
+     * @throws ReflectionException
      * @throws InvalidArgumentException
+     * @throws \Doctrine\DBAL\Driver\Exception
      */
-    public function get($name, $request) {
+    public function get(string $name, int $mode = 0)
+    {
         $query = $this->getContent($name);
         $variables = $this->getVariables($name);
-        $requests = $this->filter($request->query->all(), $variables);
 
-        $stmt = $this->entity
-            ->getConnection()
-            ->prepare($query);
+        $requests = $this->filter($this->request->getCurrentRequest()->query->all(), $variables);
+
+        $stmt = $this->entity->getConnection()->prepare($query);
 
         foreach ($requests as $key => $value) {
             $key = strtolower($key);
@@ -119,6 +84,9 @@ class LogRepository
             switch ($key) {
                 case 'date':
                     $stmt->bindValue($key, $value . '%');
+                    $format = AppBundle::VIEWFORMAT[$mode];
+                    $view = DateHelper::analyzeDate($value);
+                    $stmt->bindValue('view', $format[$view]);
                     break;
                 case 'search':
                     $stmt->bindValue($key, '%' . $value . '%');
@@ -129,18 +97,72 @@ class LogRepository
             }
         }
 
-        $key = md5($query . serialize($requests));
+        $key = md5($query . serialize($this->getProperty($stmt, 'params')));
         $item = $this->cache->getItem($key);
 
         if ($item->isHit() && $this->param->get('cache')) {
             $result = $item->get();
         } else {
-            $stmt->executeQuery();
-            $result = $stmt->fetchAll();
+            $result = $mode ?
+                $stmt->executeQuery()->fetchAssociative() :
+                $stmt->executeQuery()->fetchAllAssociative();
             $item->set($result);
             $this->cache->save($item);
         }
 
         return $result;
+    }
+
+    /**
+     * @param string $name
+     * @return false|string
+     */
+    public function getContent(string $name)
+    {
+        $file = new FileLocator($this->path);
+        $file = $file->locate($name);
+
+        return file_get_contents($file);
+    }
+
+    /**
+     * @param string $file
+     * @return array|mixed
+     */
+    public function getVariables(string $file)
+    {
+        $pattern = '/:(\w*)/';
+        preg_match_all($pattern, $this->getContent($file), $matches);
+
+        return $matches[1] ?? [];
+    }
+
+    /**
+     * @param object $object
+     * @param string $name
+     * @return mixed
+     * @throws ReflectionException
+     */
+    public function getProperty(object $object, string $name)
+    {
+        $reflection = new ReflectionClass($object);
+        $property = $reflection->getProperty($name);
+        $property->setAccessible(true);
+
+        return $property->getValue($object);
+    }
+
+    /**
+     * @param array $assoc
+     * @param array $list
+     * @return array
+     */
+    public function filter(array $assoc, array $list)
+    {
+        $data = [];
+        foreach ($list as $value) {
+            $data[$value] = $assoc[$value] ?? '';
+        }
+        return $data;
     }
 }

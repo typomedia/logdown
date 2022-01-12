@@ -2,8 +2,8 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Helper\DateHelper;
 use AppBundle\Repository\LogRepository;
-use Doctrine\DBAL\Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,12 +31,10 @@ class LogController extends AbstractController
 
     /**
      * @Route("/", name="logs_index", methods={"GET"})
-     * @throws Exception
-     * @throws \Doctrine\DBAL\Driver\Exception|\Psr\Cache\InvalidArgumentException
      */
     public function index(Request $request): Response
     {
-        $logs = $this->repo->get('Request.sql', $request);
+        $logs = $this->repo->get('Request.sql');
         $search = trim($request->query->get('search'));
 
         return $this->render('@App/logs/index.html.twig', [
@@ -47,16 +45,15 @@ class LogController extends AbstractController
 
     /**
      * @Route("/search", name="logs_search", methods={"GET"})
-     * @throws Exception
-     * @throws \Doctrine\DBAL\Driver\Exception|\Psr\Cache\InvalidArgumentException
      */
     public function search(Request $request): Response
     {
-        $logs = $this->repo->get('Search.sql', $request);
+        $logs = $this->repo->get('Search.sql');
+        $view = DateHelper::analyzeDate($request->query->get('date'));
 
         return $this->render('@App/search/index.html.twig', [
-            'search' => $request->query->all(),
             'logs' => $logs,
+            'view'   => $view
         ]);
     }
 }

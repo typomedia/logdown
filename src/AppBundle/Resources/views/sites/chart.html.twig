@@ -1,0 +1,94 @@
+{% extends '@App/base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('themes/zuse/libs/chartist/chartist.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('themes/zuse/libs/chartist/plugins/tooltip.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="content" style="padding: 10px 20px">
+        <div class="parent">
+            <div class="left">
+                {% set label = 'primary' %}
+                {% if info.method == 'GET' %}
+                    {% set label = 'success' %}
+                {% endif %}
+                <span class="label label-{{ label }}">
+                    {{ info.method }}
+                </span>&ensp;
+                <code>{{ info.request }}{% if info.param != '-' %}?{{ info.param }}{% endif %}
+                </code>
+            </div>
+            <div class="center">
+                <strong>
+                    {% if view == 'hour' %}
+                        {{ info.datetime }}:00
+                    {% else %}
+                        {{ info.datetime }}
+                    {% endif %}
+                </strong>
+            </div>
+            <div class="right">
+                 {% if info.port == '443' %}
+                     <span class="label label-success">
+                         <i class="fa fa-lock"></i>&ensp;{{ info.port }}
+                     </span>&ensp;
+                {% else %}
+                     <span class="label label-default">
+                         <i class="fa fa-unlock"></i>&ensp;{{ info.port }}
+                     </span>&ensp;
+                 {% endif %}
+                {% set label = 'default' %}
+                {% if info.status == '200' %}
+                    {% set label = 'success' %}
+                {% endif %}
+                {% if info.status == '500' %}
+                    {% set label = 'danger' %}
+                {% endif %}
+                <span class="label label-{{ label }}">
+                    {{ info.status }}
+                </span>&ensp;
+                <span class="avg ms">{{ info.average|round }}</span>&ensp;|&ensp;{{ info.number }}&ensp;<span class="fa fa-bullseye"></span>
+            </div>
+        </div>
+        <div id="1" style="height: 280px" class="ct-chart"></div>
+        <div id="2" style="height: 280px" class="ct-chart time"></div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{ asset('themes/zuse/libs/chartist/chartist.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('themes/zuse/libs/chartist/plugins/pointlabels.min.js') }}"></script>
+    <script>
+        new Chartist.Line('.ct-chart', {
+            labels: {{ labels|raw }},
+            series: [
+                {{ number|raw }}
+            ]
+        }, {
+            showArea: true,
+            plugins: [
+                Chartist.plugins.ctPointLabels({
+                    textAnchor: 'middle'
+                })
+            ]
+        });
+
+        new Chartist.Line('.time', {
+            labels: {{ labels|raw }},
+            series: [
+                {{ median|raw }}
+            ]
+        }, {
+            showArea: true,
+            plugins: [
+                // Chartist.plugins.tooltip(),
+                Chartist.plugins.ctPointLabels({
+                    textAnchor: 'middle'
+                })
+            ]
+        });
+    </script>
+{% endblock %}
