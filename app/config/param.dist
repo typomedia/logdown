@@ -1,5 +1,5 @@
 parameters:
     cache: true
-    toolbar: true
+    toolbar: false
     secret: CHANGEME
 
