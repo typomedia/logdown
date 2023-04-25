@@ -1,14 +1,22 @@
-# Microfony Framework
+# Logdown
 
-Microfony is a micro framework based on [Symfony](https://symfony.com/) 4.4 LTS.
+Logdown is a Log analyzer for IIS Logs.
 
-To be minimal the frontend page is build with [Pure](https://purecss.io) and uses [Twig](https://twig.symfony.com) as Template Engine.
+## Upload Settings
 
-## Requirements
+In the `nginx.conf` file you have to set the following settings:
 
-To check the requirements run
+    client_max_body_size 200M
 
-    bin/symfony_requirements
+In the `fpm/php.ini` file you have to set the following settings:
+
+    upload_max_filesize = 200M
+    max_file_uploads = 40
+    post_max_size = 200M
+    memory_limit = 256M
+    max_execution_time = 600
+    max_input_time = 600
+
     
 ## Composer
 
