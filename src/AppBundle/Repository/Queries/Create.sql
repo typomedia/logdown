@@ -1,0 +1,16 @@
+create table if not exists Log
+(id INTEGER PRIMARY KEY AUTOINCREMENT,
+ date DATETIME,
+ server TEXT,
+ method TEXT,
+ request TEXT,
+ param TEXT,
+ port INTEGER,
+ user TEXT,
+ client TEXT,
+ agent TEXT,
+ referer TEXT,
+ status INTEGER,
+ substatus INTEGER,
+ win32 TEXT,
+ duration INTEGER)

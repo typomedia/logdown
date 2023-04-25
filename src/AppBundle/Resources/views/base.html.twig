@@ -32,6 +32,9 @@
                     <li class="{% if route starts with 'logs' %}active{% endif %}">
                         <a href="{{ path('logs_index') }}"><span class="fa fa-bullseye"></span> Requests</a>
                     </li>
+                    <li class="{% if route starts with 'app_upload' %}active{% endif %}">
+                        <a href="{{ path('app_upload_index') }}"><span class="fa fa-upload"></span> Upload</a>
+                    </li>
                     <li class="{% if route starts with 'app_about' %}active{% endif %}">
                         <a href="{{ path('app_about_info') }}"><span class="fa fa-info-circle"></span> About</a>
                     </li>

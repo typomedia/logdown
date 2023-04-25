@@ -10,7 +10,7 @@
         "symfony/symfony": "^4.4",
         "twig/twig": "^2.14",
         "typomedia/sysinfo": "^1.0",
-        "ext-json": "*"
+        "ext-pdo": "*"
     },
     "require-dev": {
         "symfony/maker-bundle": "^1.36",

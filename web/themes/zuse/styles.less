@@ -221,6 +221,35 @@ html {
   border: none;
 }
 
+.dropzone {
+  margin-top: 20px;
+  border-radius: 1em;
+  border: 2px dashed @color-primary !important;
+  div {
+    margin: 2em 0 0 !important;
+    text-align: center;
+    i.fa {
+      font-size: 32pt
+    }
+  }
+  .dz-image {
+    display: none !important;
+  }
+  .dz-preview {
+    display: none !important;
+  }
+  .dz-message {
+    margin: 0 !important;
+  }
+}
+
+.dz-drag-hover {
+  border: 2px dashed @color-secondary !important;
+  background: rgba(0, 0, 0, 0.05) !important;
+  //transition: opacity 1s ease;
+  //opacity: 0.5;
+}
+
 @media (min-width: 768px) {
   div.collapse {
     background: none !important;

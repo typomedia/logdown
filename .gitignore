@@ -3,4 +3,5 @@
 /var/cache
 /var/logs
 /var/data
-/composer.lock
+composer.lock
+app/config/param.yml

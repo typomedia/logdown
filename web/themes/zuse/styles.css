@@ -201,6 +201,31 @@ html body footer div i.love {
   background: none;
   border: none;
 }
+.dropzone {
+  margin-top: 20px;
+  border-radius: 1em;
+  border: 2px dashed #0e96d2 !important;
+}
+.dropzone div {
+  margin: 2em 0 0 !important;
+  text-align: center;
+}
+.dropzone div i.fa {
+  font-size: 32pt;
+}
+.dropzone .dz-image {
+  display: none !important;
+}
+.dropzone .dz-preview {
+  display: none !important;
+}
+.dropzone .dz-message {
+  margin: 0 !important;
+}
+.dz-drag-hover {
+  border: 2px dashed #82c841 !important;
+  background: rgba(0, 0, 0, 0.05) !important;
+}
 @media (min-width: 768px) {
   div.collapse {
     background: none !important;
@@ -212,4 +237,3 @@ html body footer div i.love {
     width: 310px;
   }
 }
-/*# sourceMappingURL=styles.css.map */

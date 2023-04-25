@@ -1,0 +1,46 @@
+{% extends '@App/base.html.twig' %}
+
+{% block body %}
+    <section class="container-fluid">
+        <div class="container">
+            <div class="row" style="margin-top: 20px">
+                <div class="col-md-12">
+                    Upload your IIS log files here. Each time you upload new files the database will be rebuilt. Maximum <strong>20</strong> parallel uploads are allowed at once!
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <form action="{{ path('app_upload_upload') }}" enctype="multipart/form-data" class="dropzone" id="dropzone">
+                        <div>
+                            <i class="fa fa-folder-open-o"></i>
+                        </div>
+                    </form>
+                </div>
+                <h1 id="filename"></h1>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('themes/zuse/libs/dropzone/dropzone.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ asset('themes/zuse/libs/dropzone/dropzone.min.css') }}"/>
+    <script>
+        Dropzone.options.dropzone = {
+            autoProcessQueue: true,
+            uploadMultiple: true,
+            parallelUploads: 40,
+            //maxFiles : 10,
+            dictDefaultMessage: 'Open',
+            success: function(file, response) {
+                console.log(response.files);
+                {#for (const logs of response.files) {#}
+                {#    // alert(logs);#}
+                {#    window.location = "{{ path('logs_index') }}";#}
+                {#}#}
+                window.location = "{{ path('logs_index') }}";
+            },
+        };
+    </script>
+{% endblock %}
