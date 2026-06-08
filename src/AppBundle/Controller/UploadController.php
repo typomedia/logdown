@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Repository\LogRepository;
+use AppBundle\Service\LogParser;
 use PDO;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -77,29 +78,51 @@ class UploadController extends AbstractController
         $this->db->exec($query);
         $this->db->exec('PRAGMA foreign_keys = OFF');
 
+        $parser = new LogParser();
+
         foreach ($files as $file) {
             $name = $file->getClientOriginalName();
             $type = $file->getMimetype();
 
             if ($type === 'text/plain') {
-                $lines = file($file->getPathname());
-
-                foreach ($lines as $key => $line) {
-                    $entry = explode(' ', $line);
-
-                    if ($entry[0][0] !== '#') {
-                        $datetime = $entry[0] . ' ' . $entry[1];
-                        $query = "INSERT INTO Log (id, date, server, method, request, param, port, user, client, agent, referer, status, substatus, win32, duration) 
-VALUES (null, '$datetime', '$entry[2]', '$entry[3]', '$entry[4]', '$entry[5]', '$entry[6]', '$entry[7]', '$entry[8]', '$entry[9]', '$entry[10]', '$entry[11]', '$entry[12]', '$entry[13]', '$entry[14]')";
-                        $this->db->exec($query);
-                    }
-                    $this->totalLines = $key + 1;
+                $count = 0;
+                foreach ($parser->parseFile($file->getPathname()) as $row) {
+                    $this->insertRow($row);
+                    $count++;
                 }
+                $this->totalLines = $count;
 
                 $this->logs['files'][] = $name;
             }
         }
 
         return new JsonResponse($this->logs);
+    }
+
+    /**
+     * Insert a parsed log row, building the statement from the columns the
+     * parser actually produced so that varying field sets are supported.
+     *
+     * @param array $row
+     * @return void
+     */
+    private function insertRow(array $row): void
+    {
+        $columns = array_keys($row);
+        $placeholders = array_map(static function (string $column) {
+            return ':' . $column;
+        }, $columns);
+
+        $query = sprintf(
+            'INSERT INTO Log (%s) VALUES (%s)',
+            implode(', ', $columns),
+            implode(', ', $placeholders)
+        );
+
+        $stmt = $this->db->prepare($query);
+        foreach ($row as $column => $value) {
+            $stmt->bindValue(':' . $column, $value);
+        }
+        $stmt->execute();
     }
 }
