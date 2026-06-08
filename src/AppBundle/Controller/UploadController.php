@@ -69,17 +69,17 @@ class UploadController extends AbstractController
             }
         }
 
-        $temp = $this->params->get('kernel.project_dir') . '/var/data/sqlog.db';
-        $this->fs->remove($temp);
-        $this->db = new PDO('sqlite:' . $temp);
+        $schema = $this->repo->getContent('Create.sql');
 
-        $query = $this->repo->getContent('Create.sql');
-
-        $this->db->exec($query);
+        // Build the database in memory so the import never touches the disk,
+        // then move the finished database to its destination in one pass.
+        $this->db = new PDO('sqlite::memory:');
+        $this->db->exec($schema);
         $this->db->exec('PRAGMA foreign_keys = OFF');
 
         $parser = new LogParser();
 
+        $this->db->beginTransaction();
         foreach ($files as $file) {
             $name = $file->getClientOriginalName();
             $type = $file->getMimetype();
@@ -95,8 +95,33 @@ class UploadController extends AbstractController
                 $this->logs['files'][] = $name;
             }
         }
+        $this->db->commit();
+
+        $temp = $this->params->get('kernel.project_dir') . '/var/data/sqlog.db';
+        $this->persist($temp, $schema);
 
         return new JsonResponse($this->logs);
+    }
+
+    /**
+     * Move the in-memory database to the on-disk file that Doctrine reads,
+     * replacing any previous contents.
+     *
+     * @param string $path   Destination SQLite file.
+     * @param string $schema  CREATE statement(s) for the Log table.
+     * @return void
+     */
+    private function persist(string $path, string $schema): void
+    {
+        $this->fs->remove($path);
+        $this->fs->mkdir(dirname($path));
+
+        $this->db->exec(sprintf('ATTACH DATABASE %s AS disk', $this->db->quote($path)));
+        $this->db->exec('BEGIN');
+        $this->db->exec(preg_replace('/\bLog\b/', 'disk.Log', $schema, 1));
+        $this->db->exec('INSERT INTO disk.Log SELECT * FROM main.Log');
+        $this->db->exec('COMMIT');
+        $this->db->exec('DETACH DATABASE disk');
     }
 
     /**
