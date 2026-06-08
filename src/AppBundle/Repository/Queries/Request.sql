@@ -11,4 +11,4 @@ where (request like :search
     or param like :search)
 group by datetime, method, request, param, port, status
 order by datetime desc, number desc
-limit 200
+limit 500
