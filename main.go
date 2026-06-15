@@ -1,7 +1,9 @@
 package main
 
 import (
+	"embed"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 	"time"
@@ -11,8 +13,11 @@ import (
 	"logdown/app/repo"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/gofiber/template/html/v2"
+
 	flag "github.com/spf13/pflag"
 )
 
@@ -20,6 +25,14 @@ const (
 	appName    = "Logdown"
 	appVersion = "2.0.0"
 )
+
+//go:embed app/views
+var views embed.FS
+
+//go:embed public
+var public embed.FS
+
+var engine *html.Engine
 
 func main() {
 	addr := flag.String("addr", envOr("LOGDOWN_ADDR", ":4000"), "listen address")
@@ -38,8 +51,11 @@ func main() {
 		log.Fatalf("compile templates: %v", err)
 	}
 
+	engine = html.NewFileSystem(http.FS(views), ".html")
+
 	app := fiber.New(fiber.Config{
 		AppName:               appName,
+		Views:                 engine,
 		BodyLimit:             512 * 1024 * 1024, // matches the original 512M upload limit
 		DisableStartupMessage: false,
 		ReadTimeout:           10 * time.Minute,
@@ -53,6 +69,12 @@ func main() {
 
 	h := handler.New(r, rdr, renderer.App{Name: appName, Version: appVersion}, time.Now().Year())
 	h.Register(app)
+
+	// publish static embedded certs like css, js, images
+	app.Use("/", filesystem.New(filesystem.Config{
+		Root:       http.FS(public),
+		PathPrefix: "public",
+	}))
 
 	if err := app.Listen(*addr); err != nil {
 		log.Fatalf("server: %v", err)
