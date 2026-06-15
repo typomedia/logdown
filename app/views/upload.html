@@ -15,6 +15,10 @@
                     </form>
                 </div>
                 <h1 id="filename"></h1>
+                <div id="upload-status" style="display:none; text-align:center; margin-top: 20px;">
+                    <i class="fa fa-spinner fa-spin fa-3x"></i>
+                    <p id="upload-status-text" style="margin-top: 10px;">Uploading…</p>
+                </div>
             </div>
         </div>
     </section>
@@ -33,6 +37,22 @@
             uploadMultiple: true,
             parallelUploads: 40,
             dictDefaultMessage: 'Open',
+            init: function() {
+                var status = document.getElementById('upload-status');
+                var text = document.getElementById('upload-status-text');
+                this.on('sendingmultiple', function() {
+                    text.textContent = 'Uploading…';
+                    status.style.display = 'block';
+                });
+                this.on('totaluploadprogress', function(progress) {
+                    if (progress >= 100) {
+                        text.textContent = 'Importing into database…';
+                    }
+                });
+                this.on('errormultiple', function() {
+                    text.textContent = 'Upload failed.';
+                });
+            },
             success: function(file, response) {
                 console.log(response.files);
                 window.location = "/";
