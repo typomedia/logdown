@@ -49,13 +49,17 @@ type Repo struct {
 }
 
 // Open opens (or lazily creates) the SQLite database at path and ensures the
-// query indexes exist.
+// Log table and query indexes exist.
 func Open(path string) (*Repo, error) {
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 		return nil, err
 	}
 	db, err := openDB(path)
 	if err != nil {
+		return nil, err
+	}
+	if err := ensureSchema(db); err != nil {
+		db.Close()
 		return nil, err
 	}
 	if err := ensureIndexes(db); err != nil {
@@ -65,19 +69,18 @@ func Open(path string) (*Repo, error) {
 	return &Repo{path: path, db: db}, nil
 }
 
-// ensureIndexes creates the query indexes when the Log table exists. It is a
-// no-op on a fresh database that has not yet received an upload (the table is
-// created during the first Rebuild). Idempotent thanks to IF NOT EXISTS.
-func ensureIndexes(db *sql.DB) error {
-	var name string
-	err := db.QueryRow(
-		"SELECT name FROM sqlite_master WHERE type='table' AND name='Log'").Scan(&name)
-	if err == sql.ErrNoRows {
-		return nil
-	}
+// ensureSchema runs Create.sql, which creates the Log table if it is missing.
+func ensureSchema(db *sql.DB) error {
+	schema, err := queryFS.ReadFile("queries/Create.sql")
 	if err != nil {
 		return err
 	}
+	_, err = db.Exec(string(schema))
+	return err
+}
+
+// ensureIndexes creates the query indexes. Idempotent thanks to IF NOT EXISTS.
+func ensureIndexes(db *sql.DB) error {
 	for _, ddl := range indexDDL {
 		if _, err := db.Exec(ddl); err != nil {
 			return err
