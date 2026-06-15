@@ -1,41 +1,52 @@
 # Logdown
 
-Logdown is a Log analyzer for IIS Logs.
+Logdown is a log analyzer for IIS logs, rewritten in Go with
+[Fiber](https://gofiber.io/). It parses W3C Extended Log Format files, stores
+them in SQLite and serves the request/search/chart views. The front-end assets
+(Bootstrap, jQuery, Chartist, Dropzone, fonts) are kept exactly as they were.
 
-## Upload Settings
+## Requirements
 
-In the `nginx.conf` file you have to set the following settings:
+* Go 1.21+ (built and tested with Go 1.25)
 
-    client_max_body_size 200M
+The SQLite driver is the pure-Go [`modernc.org/sqlite`](https://pkg.go.dev/modernc.org/sqlite),
+so no CGO or system libraries are needed.
 
-In the `fpm/php.ini` file you have to set the following settings:
+## Run
 
-    upload_max_filesize = 200M
-    max_file_uploads = 40
-    post_max_size = 200M
-    memory_limit = 256M
-    max_execution_time = 600
-    max_input_time = 600
+    make run        # go run .
+    make build      # builds ./logdown
+    make test       # runs the unit tests
 
-    
-## Composer
+Then open <http://localhost:4000>.
 
-    sudo curl -LsS https://getcomposer.org/installer -o /usr/local/bin/composer
-    sudo chmod a+x /usr/local/bin/composer
-    sudo composer self-update
+## Configuration
 
-## Installation
+All options have sensible defaults and can be set via flag or environment variable:
 
-    git clone https://gitlab.com/typomedia/microfony.git
-    cd microfony
-    composer install
-    php -S localhost:8000 -t web
+| Flag      | Env             | Default             | Description                       |
+|-----------|-----------------|---------------------|-----------------------------------|
+| `-addr`   | `LOGDOWN_ADDR`  | `:4000`             | Listen address                    |
+| `-db`     | `LOGDOWN_DB`    | `var/data/sqlog.db` | SQLite database path              |
+| `-web`    | `LOGDOWN_WEB`   | `web`               | Static asset directory            |
+| `-cache`  | `LOGDOWN_CACHE` | `true`              | Enable the query result cache     |
 
-## Developer
+The upload body limit is 512 MB and read/write timeouts are 10 minutes, matching
+the limits the original PHP deployment used.
 
-For [PhpStorm](https://www.jetbrains.com/phpstorm/) users install the following Plugins:
+## Usage
 
-* [Symfony Plugin](https://plugins.jetbrains.com/plugin/7219-symfony-plugin)
-* [PHP Annotations](https://plugins.jetbrains.com/plugin/7320-php-annotations)
+* **Requests** (`/`) — aggregated requests per month; filter with the search box.
+* **Search** (`/search`) — drill into a single request/param over a date range.
+* **Chart** (`/chart`) — request timeline rendered with Chartist.
+* **Upload** (`/upload/`) — drag & drop IIS logfiles; the database is rebuilt
+  from scratch on every upload (up to 40 parallel uploads).
 
-php bin/console doctrine:mapping:import "App\Entity" annotation --path=src/Entity
+## Layout
+
+    main.go                 entry point, Fiber wiring, static assets
+    internal/parser         W3C Extended Log Format parser (+ tests)
+    internal/dates          granularity detection and strftime view formats
+    internal/repo           SQL queries, named-parameter binding, DB rebuild
+    internal/web            handlers, html/template rendering, templates
+    web/                    front-end assets (unchanged)

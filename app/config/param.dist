@@ -1,4 +1,0 @@
-parameters:
-    cache: true
-    toolbar: false
-    secret: CHANGEME

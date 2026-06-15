@@ -1,6 +1,4 @@
-{% extends '@App/base.html.twig' %}
-
-{% block body %}
+{{define "body"}}
     <section class="container-fluid">
         <div class="container">
             <div class="row" style="margin-top: 20px">
@@ -10,7 +8,7 @@
             </div>
             <div class="row">
                 <div class="col-md-12">
-                    <form action="{{ path('app_upload_upload') }}" enctype="multipart/form-data" class="dropzone" id="dropzone">
+                    <form action="/upload/upload" enctype="multipart/form-data" class="dropzone" id="dropzone">
                         <div>
                             <i class="fa fa-folder-open-o"></i>
                         </div>
@@ -20,27 +18,25 @@
             </div>
         </div>
     </section>
-
-{% endblock %}
-{% block javascripts %}
-    {{ parent() }}
-    <script src="{{ asset('themes/zuse/libs/dropzone/dropzone.js') }}"></script>
-    <link rel="stylesheet" href="{{ asset('themes/zuse/libs/dropzone/dropzone.min.css') }}"/>
+{{end}}
+{{define "javascripts"}}
+    <script src="/themes/zuse/libs/jquery/jquery.slim.min.js"></script>
+    <script src="/themes/zuse/libs/jquery/plugins/tablesorter.min.js"></script>
+    <script>
+        $('table.table').tablesorter();
+    </script>
+    <script src="/themes/zuse/libs/dropzone/dropzone.js"></script>
+    <link rel="stylesheet" href="/themes/zuse/libs/dropzone/dropzone.min.css"/>
     <script>
         Dropzone.options.dropzone = {
             autoProcessQueue: true,
             uploadMultiple: true,
             parallelUploads: 40,
-            //maxFiles : 10,
             dictDefaultMessage: 'Open',
             success: function(file, response) {
                 console.log(response.files);
-                {#for (const logs of response.files) {#}
-                {#    // alert(logs);#}
-                {#    window.location = "{{ path('logs_index') }}";#}
-                {#}#}
-                window.location = "{{ path('logs_index') }}";
+                window.location = "/";
             },
         };
     </script>
-{% endblock %}
+{{end}}

@@ -1,0 +1,60 @@
+{{define "body"}}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Date</th>
+                <th>Method</th>
+                <th>Request</th>
+                <th>Param</th>
+                <th>Port</th>
+                <th>Status</th>
+                <th class="number">Duration</th>
+                <th class="number">Hits</th>
+            </tr>
+        </thead>
+        <tbody>
+        {{range $i, $log := .Logs}}
+            <tr>
+                <td>{{inc $i}}</td>
+                <td>
+                    <a href="{{chartURL $log "2006-01"}}">
+                        <span class="fa fa-area-chart"></span>
+                    &ensp;{{if $log.datetime}}{{fmtDate $log.datetime "2006-01"}}{{end}}
+                    </a>
+                </td>
+                <td>
+                    <span class="label label-{{if eq $log.method "GET"}}success{{else}}primary{{end}}">
+                    {{$log.method}}
+                    </span>
+                </td>
+                <td>
+                    <a href="{{searchURL $log "2006-01"}}">
+                        <span class="fa fa-search"></span>
+                    &ensp;{{$log.request}}
+                    </a>
+                </td>
+                <td title="{{$log.param}}">{{$log.param}}</td>
+                {{if eq $log.port "443"}}
+                    <td><span class="label label-success"><i class="fa fa-lock"></i>&ensp;{{$log.port}}</span></td>
+                {{else}}
+                    <td><span class="label label-default"><i class="fa fa-unlock"></i>&ensp;{{$log.port}}</span></td>
+                {{end}}
+                <td>
+                    <span class="label label-{{if eq $log.status "200"}}success{{else if eq $log.status "500"}}danger{{else}}default{{end}}">
+                        {{$log.status}}
+                    </span>
+                </td>
+                <td class="number">
+                    <span class="avg ms">{{round $log.duration}}</span>
+                </td>
+                <td class="number">{{$log.number}}<span style="margin-left: 5px" class="fa fa-bullseye"></span></td>
+            </tr>
+        {{else}}
+            <tr>
+                <td colspan="17">no records found</td>
+            </tr>
+        {{end}}
+        </tbody>
+    </table>
+{{end}}

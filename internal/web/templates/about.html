@@ -1,13 +1,11 @@
-{% extends '@App/base.html.twig' %}
-
-{% block body %}
+{{define "body"}}
     <section class="container-fluid">
         <div class="col-md-6">
             <h2>System Information</h2>
-            <p>{{ system.os }}</p>
-            <p>{{ system.cpu }}</p>
-            <p>Symfony {{ system.symfony }}</p>
-            <p>PHP {{ system.php }}</p>
+            <p>{{.System.os}}</p>
+            <p>{{.System.cpu}}</p>
+            <p>Go {{.System.go}}</p>
+            <p>Fiber {{.System.fiber}}</p>
 
             <h2>MIT License</h2>
 
@@ -20,5 +18,4 @@
             <p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
         </div>
     </section>
-
-{% endblock %}
+{{end}}
