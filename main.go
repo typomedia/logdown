@@ -7,8 +7,9 @@ import (
 	"path/filepath"
 	"time"
 
-	"logdown/internal/repo"
-	"logdown/internal/web"
+	"logdown/app/handler"
+	"logdown/app/renderer"
+	"logdown/app/repo"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -23,8 +24,8 @@ const (
 
 func main() {
 	addr := flag.String("addr", envOr("LOGDOWN_ADDR", ":4000"), "listen address")
-	dbPath := flag.String("db", envOr("LOGDOWN_DB", "var/data/sqlog.db"), "path to the SQLite database")
-	webDir := flag.String("web", envOr("LOGDOWN_WEB", "web"), "directory holding the static assets")
+	dbPath := flag.String("db", envOr("LOGDOWN_DB", "sqlog.db"), "path to the SQLite database")
+	publicDir := flag.String("public", envOr("LOGDOWN_PUBLIC", "public"), "directory holding the static assets")
 	flag.Parse()
 
 	r, err := repo.Open(*dbPath)
@@ -33,7 +34,7 @@ func main() {
 	}
 	defer r.Close()
 
-	renderer, err := web.NewRenderer()
+	rdr, err := renderer.NewRenderer()
 	if err != nil {
 		log.Fatalf("compile templates: %v", err)
 	}
@@ -49,13 +50,13 @@ func main() {
 	app.Use(logger.New())
 
 	// Serve the existing assets untouched (themes, fonts, libs, favicon).
-	app.Static("/themes", filepath.Join(*webDir, "themes"))
-	app.Static("/favicon.ico", filepath.Join(*webDir, "favicon.ico"))
+	app.Static("/themes", filepath.Join(*publicDir, "themes"))
+	app.Static("/favicon.ico", filepath.Join(*publicDir, "favicon.ico"))
 
-	handler := web.NewHandler(r, renderer, web.App{Name: appName, Version: appVersion}, time.Now().Year())
-	handler.Register(app)
+	h := handler.New(r, rdr, renderer.App{Name: appName, Version: appVersion}, time.Now().Year())
+	h.Register(app)
 
-	log.Printf("%s listening on %s (db=%s, web=%s)", appName, *addr, *dbPath, *webDir)
+	log.Printf("%s listening on %s (db=%s, public=%s)", appName, *addr, *dbPath, *publicDir)
 	if err := app.Listen(*addr); err != nil {
 		log.Fatalf("server: %v", err)
 	}

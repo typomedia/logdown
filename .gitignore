@@ -5,3 +5,7 @@
 
 # Go build output
 /logdown
+
+# SQLite database (generated from uploads)
+/sqlog.db
+/sqlog.db.build

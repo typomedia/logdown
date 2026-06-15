@@ -14,8 +14,8 @@ import (
 	"strings"
 	"sync"
 
-	"logdown/internal/dates"
-	"logdown/internal/parser"
+	"logdown/app/dates"
+	"logdown/app/parser"
 
 	_ "modernc.org/sqlite"
 )

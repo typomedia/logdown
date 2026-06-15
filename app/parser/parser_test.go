@@ -233,7 +233,7 @@ func TestParseFileMissingFile(t *testing.T) {
 func TestAllRepoLogfilesParse(t *testing.T) {
 	root := filepath.Join("..", "..")
 	var logs []string
-	for _, pat := range []string{"u_ex*.log", "web/u_ex*.log"} {
+	for _, pat := range []string{"u_ex*.log", "public/u_ex*.log"} {
 		m, _ := filepath.Glob(filepath.Join(root, pat))
 		logs = append(logs, m...)
 	}

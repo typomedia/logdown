@@ -1,8 +1,7 @@
-package web
+package renderer
 
 import (
 	"bytes"
-	"embed"
 	"fmt"
 	"html/template"
 	"math"
@@ -10,12 +9,10 @@ import (
 	"strconv"
 	"strings"
 
-	"logdown/internal/dates"
-	"logdown/internal/repo"
+	"logdown/app/dates"
+	"logdown/app/repo"
+	"logdown/app/views"
 )
-
-//go:embed templates/*.html
-var templateFS embed.FS
 
 // App holds the application metadata shown in the layout (name/version).
 type App struct {
@@ -60,7 +57,7 @@ var pageFiles = map[string]string{
 
 var funcs = template.FuncMap{
 	"inc":       func(i int) int { return i + 1 },
-	"round":     roundStr,
+	"round":     Round,
 	"hasPrefix": strings.HasPrefix,
 	"fmtDate":   dates.Reformat,
 	"chartURL":  chartURL,
@@ -71,8 +68,8 @@ var funcs = template.FuncMap{
 func NewRenderer() (*Renderer, error) {
 	r := &Renderer{pages: map[string]*template.Template{}}
 	for route, file := range pageFiles {
-		t, err := template.New("base.html").Funcs(funcs).ParseFS(templateFS,
-			"templates/base.html", "templates/"+file)
+		t, err := template.New("base.html").Funcs(funcs).ParseFS(views.FS,
+			"base.html", file)
 		if err != nil {
 			return nil, fmt.Errorf("parsing %s: %w", file, err)
 		}
@@ -94,9 +91,10 @@ func (r *Renderer) Render(p Page) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-// roundStr rounds a numeric string to the nearest integer, mirroring Twig's
-// |round filter as used for durations.
-func roundStr(s string) string {
+// Round rounds a numeric string to the nearest integer, mirroring Twig's
+// |round filter as used for durations. It is the template "round" function and
+// is also reused by the chart handler for the median series.
+func Round(s string) string {
 	f, err := strconv.ParseFloat(strings.TrimSpace(s), 64)
 	if err != nil {
 		return s

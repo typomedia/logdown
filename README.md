@@ -27,8 +27,8 @@ All options have sensible defaults and can be set via flag or environment variab
 | Flag      | Env             | Default             | Description                       |
 |-----------|-----------------|---------------------|-----------------------------------|
 | `-addr`   | `LOGDOWN_ADDR`  | `:4000`             | Listen address                    |
-| `-db`     | `LOGDOWN_DB`    | `var/data/sqlog.db` | SQLite database path              |
-| `-web`    | `LOGDOWN_WEB`   | `web`               | Static asset directory            |
+| `-db`     | `LOGDOWN_DB`    | `sqlog.db`          | SQLite database path              |
+| `-public` | `LOGDOWN_PUBLIC`| `public`            | Static asset directory            |
 
 The upload body limit is 512 MB and read/write timeouts are 10 minutes, matching
 the limits the original PHP deployment used.
@@ -49,8 +49,10 @@ cache is needed.
 ## Layout
 
     main.go                 entry point, Fiber wiring, static assets
-    internal/parser         W3C Extended Log Format parser (+ tests)
-    internal/dates          granularity detection and strftime view formats
-    internal/repo           SQL queries, named-parameter binding, DB rebuild
-    internal/web            handlers, html/template rendering, templates
-    web/                    front-end assets (unchanged)
+    app/parser              W3C Extended Log Format parser (+ tests)
+    app/dates               granularity detection and strftime view formats
+    app/repo                SQL queries, named-parameter binding, DB rebuild
+    app/handler             HTTP route handlers (one file per route)
+    app/renderer            html/template rendering and view helpers
+    app/views               embedded HTML templates
+    public/                 front-end assets (unchanged)
