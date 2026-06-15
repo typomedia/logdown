@@ -1,4 +1,3 @@
-// Command logdown is a Go/Fiber rewrite of the Logdown IIS log analyzer.
 package main
 
 import (
@@ -19,7 +18,7 @@ import (
 
 const (
 	appName    = "Logdown"
-	appVersion = "1.1.0"
+	appVersion = "2.0.0"
 )
 
 func main() {
@@ -42,7 +41,7 @@ func main() {
 	app := fiber.New(fiber.Config{
 		AppName:               appName,
 		BodyLimit:             512 * 1024 * 1024, // matches the original 512M upload limit
-		DisableStartupMessage: true,
+		DisableStartupMessage: false,
 		ReadTimeout:           10 * time.Minute,
 		WriteTimeout:          10 * time.Minute,
 	})
@@ -51,12 +50,10 @@ func main() {
 
 	// Serve the existing assets untouched (themes, fonts, libs, favicon).
 	app.Static("/themes", filepath.Join(*publicDir, "themes"))
-	app.Static("/favicon.ico", filepath.Join(*publicDir, "favicon.ico"))
 
 	h := handler.New(r, rdr, renderer.App{Name: appName, Version: appVersion}, time.Now().Year())
 	h.Register(app)
 
-	log.Printf("%s listening on %s (db=%s, public=%s)", appName, *addr, *dbPath, *publicDir)
 	if err := app.Listen(*addr); err != nil {
 		log.Fatalf("server: %v", err)
 	}
