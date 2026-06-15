@@ -113,8 +113,16 @@ func (h *Handler) chart(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
+	// The template reads info fields unconditionally; when no row matches the
+	// requested params, seed empty defaults so missing map keys don't surface
+	// as invalid template values (the original Twig tolerated a missing row).
 	if info == nil {
 		info = repo.Row{}
+	}
+	for _, k := range []string{"datetime", "method", "request", "param", "port", "status", "number", "average"} {
+		if _, ok := info[k]; !ok {
+			info[k] = ""
+		}
 	}
 
 	p := h.page("app_chart_chart")

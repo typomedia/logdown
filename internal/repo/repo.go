@@ -29,25 +29,28 @@ type Row map[string]string
 
 var varPattern = regexp.MustCompile(`:(\w+)`)
 
-// Repo holds the connection to the on-disk SQLite database and a small result
-// cache. The database is replaced wholesale on upload, so reads and rebuilds
-// are guarded by a RWMutex.
+// indexDDL holds the indexes that keep every query fast enough to serve
+// uncached. ix_month is an expression index whose leading column matches the
+// substr() month bucket in Request.sql, letting the GROUP BY run as an
+// index-only scan; ix_filter serves the request/param/status/date predicates
+// of Search.sql and Chart.sql.
+var indexDDL = []string{
+	"CREATE INDEX IF NOT EXISTS ix_month ON Log(substr(date,1,7), method, request, param, port, status, duration)",
+	"CREATE INDEX IF NOT EXISTS ix_filter ON Log(request, param, status, date)",
+}
+
+// Repo holds the connection to the on-disk SQLite database. The database is
+// replaced wholesale on upload, so reads and rebuilds are guarded by a RWMutex.
 type Repo struct {
-	path  string
-	cache bool
+	path string
 
-	mu   sync.RWMutex
-	db   *sql.DB
-	memo map[string]cacheEntry
+	mu sync.RWMutex
+	db *sql.DB
 }
 
-type cacheEntry struct {
-	rows []Row
-}
-
-// Open opens (or lazily creates) the SQLite database at path. cache enables the
-// in-memory result cache, mirroring the original "cache" parameter.
-func Open(path string, cache bool) (*Repo, error) {
+// Open opens (or lazily creates) the SQLite database at path and ensures the
+// query indexes exist.
+func Open(path string) (*Repo, error) {
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 		return nil, err
 	}
@@ -55,7 +58,32 @@ func Open(path string, cache bool) (*Repo, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Repo{path: path, cache: cache, db: db, memo: map[string]cacheEntry{}}, nil
+	if err := ensureIndexes(db); err != nil {
+		db.Close()
+		return nil, err
+	}
+	return &Repo{path: path, db: db}, nil
+}
+
+// ensureIndexes creates the query indexes when the Log table exists. It is a
+// no-op on a fresh database that has not yet received an upload (the table is
+// created during the first Rebuild). Idempotent thanks to IF NOT EXISTS.
+func ensureIndexes(db *sql.DB) error {
+	var name string
+	err := db.QueryRow(
+		"SELECT name FROM sqlite_master WHERE type='table' AND name='Log'").Scan(&name)
+	if err == sql.ErrNoRows {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	for _, ddl := range indexDDL {
+		if _, err := db.Exec(ddl); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func openDB(path string) (*sql.DB, error) {
@@ -85,29 +113,10 @@ func (r *Repo) Query(name string, mode int, params map[string]string) ([]Row, er
 	query := string(text)
 	args := bindArgs(query, mode, params)
 
-	key := cacheKey(name, mode, args)
-	if r.cache {
-		r.mu.RLock()
-		entry, ok := r.memo[key]
-		r.mu.RUnlock()
-		if ok {
-			return entry.rows, nil
-		}
-	}
-
 	r.mu.RLock()
 	rows, err := runQuery(r.db, query, args)
 	r.mu.RUnlock()
-	if err != nil {
-		return nil, err
-	}
-
-	if r.cache {
-		r.mu.Lock()
-		r.memo[key] = cacheEntry{rows: rows}
-		r.mu.Unlock()
-	}
-	return rows, nil
+	return rows, err
 }
 
 // QueryOne runs the named query and returns the first row, or nil if there are
@@ -202,17 +211,6 @@ func toString(v any) string {
 	}
 }
 
-func cacheKey(name string, mode int, args []any) string {
-	var b strings.Builder
-	fmt.Fprintf(&b, "%s|%d", name, mode)
-	for _, a := range args {
-		if n, ok := a.(sql.NamedArg); ok {
-			fmt.Fprintf(&b, "|%s=%v", n.Name, n.Value)
-		}
-	}
-	return b.String()
-}
-
 // Rebuild creates a fresh SQLite database from the given logfile paths and
 // atomically swaps it in for the live database, mirroring UploadController:
 // the database is built off to the side, then moved into place in one pass.
@@ -247,7 +245,6 @@ func (r *Repo) Rebuild(paths []string) ([]string, error) {
 		return nil, err
 	}
 	r.db = db
-	r.memo = map[string]cacheEntry{}
 	return imported, nil
 }
 
@@ -290,6 +287,12 @@ func buildDatabase(path, schema string, paths []string) ([]string, error) {
 	}
 
 	if err := tx.Commit(); err != nil {
+		return nil, err
+	}
+
+	// Build the indexes after the bulk insert — far cheaper than maintaining
+	// them on every row.
+	if err := ensureIndexes(db); err != nil {
 		return nil, err
 	}
 	return imported, nil

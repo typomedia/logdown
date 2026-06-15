@@ -29,10 +29,14 @@ All options have sensible defaults and can be set via flag or environment variab
 | `-addr`   | `LOGDOWN_ADDR`  | `:4000`             | Listen address                    |
 | `-db`     | `LOGDOWN_DB`    | `var/data/sqlog.db` | SQLite database path              |
 | `-web`    | `LOGDOWN_WEB`   | `web`               | Static asset directory            |
-| `-cache`  | `LOGDOWN_CACHE` | `true`              | Enable the query result cache     |
 
 The upload body limit is 512 MB and read/write timeouts are 10 minutes, matching
 the limits the original PHP deployment used.
+
+The queries run uncached: the monthly bucket uses `substr(date,1,7)` instead of
+`strftime`, and expression indexes (`ix_month`, `ix_filter`, created after each
+upload) let SQLite serve the request/search/chart views directly, so no result
+cache is needed.
 
 ## Usage
 

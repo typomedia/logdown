@@ -25,10 +25,9 @@ func main() {
 	addr := flag.String("addr", envOr("LOGDOWN_ADDR", ":4000"), "listen address")
 	dbPath := flag.String("db", envOr("LOGDOWN_DB", "var/data/sqlog.db"), "path to the SQLite database")
 	webDir := flag.String("web", envOr("LOGDOWN_WEB", "web"), "directory holding the static assets")
-	cache := flag.Bool("cache", envOr("LOGDOWN_CACHE", "true") == "true", "enable the query result cache")
 	flag.Parse()
 
-	r, err := repo.Open(*dbPath, *cache)
+	r, err := repo.Open(*dbPath)
 	if err != nil {
 		log.Fatalf("open database: %v", err)
 	}

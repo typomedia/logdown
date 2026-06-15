@@ -1,4 +1,4 @@
-select strftime('%Y-%m', date) as datetime,
+select substr(date, 1, 7) as datetime,
        method,
        request,
        param,
