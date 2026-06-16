@@ -2,6 +2,7 @@
 .vscode/
 
 /dist
+/*.png
 
 # SQLite database (generated from uploads)
 /sqlog.db

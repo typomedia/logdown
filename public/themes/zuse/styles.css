@@ -100,7 +100,7 @@ html body > section table {
 html body > section table thead {
   background: #eeeeee;
 }
-html body > section table thead th.header {
+html body > section table thead th {
   cursor: pointer;
   border-bottom: 0;
 }

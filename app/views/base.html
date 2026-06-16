@@ -51,10 +51,9 @@
     </div>
 </footer>
 {{block "javascripts" .}}
-    <script src="/themes/zuse/libs/jquery/jquery.slim.min.js"></script>
-    <script src="/themes/zuse/libs/jquery/plugins/tablesorter.min.js"></script>
+    <script src="/themes/zuse/libs/tablesort/tablesort.min.js"></script>
     <script>
-        $('table.table').tablesorter();
+        new Tablesort(document.getElementById('sortable'));
     </script>
 {{end}}
 </body>

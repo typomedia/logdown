@@ -1,6 +1,6 @@
 {{define "body"}}
     {{$dl := "2006-01-02"}}{{if eq .View "day"}}{{$dl = "2006-01-02 15"}}{{end}}
-    <table class="table">
+    <table id="sortable" class="table">
         <thead>
             <tr>
                 <th>#</th>

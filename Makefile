@@ -25,3 +25,9 @@ update:
 
 tidy:
 	go mod tidy
+
+icon:
+	go install github.com/typomedia/rasterize@latest
+	rasterize -i logdown.svg --size 256
+	go install github.com/typomedia/iconize@latest
+	iconize logdown.png -o public/favicon.ico
