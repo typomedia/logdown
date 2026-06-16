@@ -35,11 +35,24 @@ func Columns() []string {
 	return append(cols, "date")
 }
 
+// format is the access log dialect a Parser has locked onto. A parser starts
+// in formatUnknown and is pinned the moment it sees its first IIS directive or
+// a line that matches the CLF/Combined pattern, after which subsequent lines
+// are dispatched accordingly.
+type format int
+
+const (
+	formatUnknown format = iota
+	formatIIS
+	formatAccess
+)
+
 // Parser holds the field order currently in effect, taken from the most recent
 // "#Fields:" directive. A single Parser may be reused across many lines and
 // files; each "#Fields:" directive redefines the columns.
 type Parser struct {
 	fields []string
+	format format
 }
 
 // New returns a Parser with no fields defined yet.
@@ -59,10 +72,12 @@ func (p *Parser) SetFields(directive string) {
 
 // ParseLine parses a single line.
 //
-// Directive lines (starting with "#") update the parser state and return nil.
-// The "#Fields:" directive defines the column order used for all following data
-// lines. Data lines return a row keyed by Log column name, or nil when no
-// "#Fields:" directive has been seen yet.
+// Directive lines (starting with "#") pin the parser to the IIS dialect and
+// return nil; "#Fields:" defines the column order used for following IIS data
+// lines. Non-directive lines are dispatched to the IIS or CLF/Combined parser
+// depending on which dialect the parser has locked onto; a parser that has
+// not yet seen a directive auto-detects CLF/Combined on the first match.
+// Returns nil when the line cannot be interpreted.
 func (p *Parser) ParseLine(line string) map[string]string {
 	line = strings.TrimSpace(line)
 	if line == "" {
@@ -70,17 +85,28 @@ func (p *Parser) ParseLine(line string) map[string]string {
 	}
 
 	if line[0] == '#' {
+		p.format = formatIIS
 		if strings.HasPrefix(strings.ToLower(line), "#fields:") {
 			p.SetFields(line[len("#Fields:"):])
 		}
 		return nil
 	}
 
-	if len(p.fields) == 0 {
-		return nil
+	switch p.format {
+	case formatIIS:
+		if len(p.fields) == 0 {
+			return nil
+		}
+		return p.mapValues(strings.Fields(line))
+	case formatAccess:
+		return parseAccess(line)
 	}
 
-	return p.mapValues(strings.Fields(line))
+	if row := parseAccess(line); row != nil {
+		p.format = formatAccess
+		return row
+	}
+	return nil
 }
 
 // ParseFile parses a whole logfile, invoking fn for every data row. Iteration

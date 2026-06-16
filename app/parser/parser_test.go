@@ -230,6 +230,77 @@ func TestParseFileMissingFile(t *testing.T) {
 	}
 }
 
+func TestParsesCombinedLogFormat(t *testing.T) {
+	p := New()
+	row := p.ParseLine(`127.0.0.1 - frank [10/Oct/2000:13:55:36 -0700] "GET /apache_pb.gif?x=1 HTTP/1.0" 200 2326 "http://www.example.com/start.html" "Mozilla/4.08 [en] (Win98; I ;Nav)"`)
+	want := map[string]string{
+		"client": "127.0.0.1", "user": "frank",
+		"date":   "2000-10-10 13:55:36",
+		"method": "GET", "request": "/apache_pb.gif", "param": "x=1",
+		"status":  "200",
+		"referer": "http://www.example.com/start.html",
+		"agent":   "Mozilla/4.08 [en] (Win98; I ;Nav)",
+	}
+	for k, v := range want {
+		if row[k] != v {
+			t.Errorf("%s: expected %q, got %q", k, v, row[k])
+		}
+	}
+}
+
+func TestParsesCommonLogFormat(t *testing.T) {
+	p := New()
+	row := p.ParseLine(`10.0.0.1 - - [10/Oct/2000:13:55:36 +0000] "POST /api/v1/users HTTP/1.1" 201 512`)
+	if row["client"] != "10.0.0.1" || row["method"] != "POST" ||
+		row["request"] != "/api/v1/users" || row["param"] != "-" ||
+		row["status"] != "201" || row["date"] != "2000-10-10 13:55:36" {
+		t.Errorf("unexpected row %v", row)
+	}
+	if _, ok := row["referer"]; ok {
+		t.Error("plain CLF should not produce a referer column")
+	}
+	if _, ok := row["agent"]; ok {
+		t.Error("plain CLF should not produce an agent column")
+	}
+}
+
+func TestParseFileAutoDetectsAccessLog(t *testing.T) {
+	path := tmpLog(t, `198.51.100.21 - alice [13/Jun/2026:00:01:34 +0000] "GET /api/v1/orders?status=open HTTP/1.1" 200 1742 "-" "curl/8.4.0"
+198.51.100.21 - - [13/Jun/2026:00:02:48 +0000] "GET /missing.html HTTP/1.1" 404 21 "-" "Mozilla/5.0"
+`)
+	rows := collect(t, New(), path)
+	if len(rows) != 2 {
+		t.Fatalf("expected 2 rows, got %d", len(rows))
+	}
+	if rows[0]["request"] != "/api/v1/orders" || rows[0]["param"] != "status=open" {
+		t.Errorf("row 0 unexpected %v", rows[0])
+	}
+	if rows[1]["status"] != "404" || rows[1]["agent"] != "Mozilla/5.0" {
+		t.Errorf("row 1 unexpected %v", rows[1])
+	}
+}
+
+func TestParsesCombinedExtendedWithPortAndDuration(t *testing.T) {
+	p := New()
+	row := p.ParseLine(`198.51.100.21 - alice [13/Jun/2026:00:01:34 +0000] "GET /api/v1/orders?status=open HTTP/1.1" 200 4912 "-" "curl/8.4.0" 443 274`)
+	if row["port"] != "443" || row["duration"] != "274" {
+		t.Errorf("expected port=443 duration=274, got %v", row)
+	}
+}
+
+func TestAccessLogLockoutFromIISMixed(t *testing.T) {
+	p := New()
+	// Once an IIS directive is seen the access-log path is no longer tried,
+	// so a CLF-looking line afterwards is treated as malformed IIS data and
+	// returns nil instead of getting misclassified.
+	p.ParseLine("#Fields: date time cs-method")
+	if row := p.ParseLine(`127.0.0.1 - - [10/Oct/2000:13:55:36 -0700] "GET / HTTP/1.0" 200 1`); row != nil {
+		if _, ok := row["client"]; ok {
+			t.Errorf("CLF line should not be parsed once the parser is pinned to IIS, got %v", row)
+		}
+	}
+}
+
 func TestAllRepoLogfilesParse(t *testing.T) {
 	root := filepath.Join("..", "..")
 	var logs []string
