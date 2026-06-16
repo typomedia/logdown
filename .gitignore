@@ -1,9 +1,5 @@
 .idea/
 .vscode/
-
 /dist
 /*.png
-
-# SQLite database (generated from uploads)
-/sqlog.db
-/sqlog.db.build
+/logdown.db

@@ -1,6 +1,6 @@
 @import "libs/bootstrap/css/bootstrap.min.css";
-@import "fonts/FontAwesome/css/font-awesome.min.css";
-@import "fonts/PTSans/PTS55F_stylesheet.css";
+@import "fonts/FontAwesome/css/font-awesome.css";
+@import "fonts/PTSans/stylesheet.css";
 .btn {
   border-radius: 0;
 }
@@ -21,7 +21,7 @@ html {
   height: 100%;
 }
 html body {
-  font-family: 'PTSansRegular', serif;
+  font-family: 'PT Sans', serif;
   height: 100%;
 }
 html body > header {
