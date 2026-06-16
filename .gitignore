@@ -1,10 +1,7 @@
-/.idea/
-/var/cache
-/var/logs
-/var/data
+.idea/
+.vscode/
 
-# Go build output
-/logdown
+/dist
 
 # SQLite database (generated from uploads)
 /sqlog.db
