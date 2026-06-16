@@ -2,10 +2,9 @@ package main
 
 import (
 	"embed"
+	"fmt"
 	"log"
 	"net/http"
-	"os"
-	"path/filepath"
 	"time"
 
 	"logdown/app/handler"
@@ -22,8 +21,8 @@ import (
 )
 
 const (
-	appName    = "Logdown"
-	appVersion = "2.0.0"
+	Name    = "Logdown"
+	Version = "2.0.0"
 )
 
 //go:embed app/views
@@ -35,12 +34,11 @@ var public embed.FS
 var engine *html.Engine
 
 func main() {
-	addr := flag.String("addr", envOr("LOGDOWN_ADDR", ":4000"), "listen address")
-	dbPath := flag.String("db", envOr("LOGDOWN_DB", "sqlog.db"), "path to the SQLite database")
-	publicDir := flag.String("public", envOr("LOGDOWN_PUBLIC", "public"), "directory holding the static assets")
+	port := flag.IntP("port", "p", 4000, "Port to listen on")
+	database := flag.StringP("database", "d", "logdown.db", "SQLite database file")
 	flag.Parse()
 
-	r, err := repo.Open(*dbPath)
+	r, err := repo.Open(*database)
 	if err != nil {
 		log.Fatalf("open database: %v", err)
 	}
@@ -54,7 +52,7 @@ func main() {
 	engine = html.NewFileSystem(http.FS(views), ".html")
 
 	app := fiber.New(fiber.Config{
-		AppName:               appName,
+		AppName:               Name,
 		Views:                 engine,
 		BodyLimit:             512 * 1024 * 1024, // matches the original 512M upload limit
 		DisableStartupMessage: false,
@@ -64,10 +62,7 @@ func main() {
 	app.Use(recover.New())
 	app.Use(logger.New())
 
-	// Serve the existing assets untouched (themes, fonts, libs, favicon).
-	app.Static("/themes", filepath.Join(*publicDir, "themes"))
-
-	h := handler.New(r, rdr, renderer.App{Name: appName, Version: appVersion}, time.Now().Year())
+	h := handler.New(r, rdr, renderer.App{Name: Name, Version: Version}, time.Now().Year())
 	h.Register(app)
 
 	// publish static embedded certs like css, js, images
@@ -76,14 +71,5 @@ func main() {
 		PathPrefix: "public",
 	}))
 
-	if err := app.Listen(*addr); err != nil {
-		log.Fatalf("server: %v", err)
-	}
-}
-
-func envOr(key, def string) string {
-	if v := os.Getenv(key); v != "" {
-		return v
-	}
-	return def
+	log.Fatal(app.Listen(fmt.Sprintf(":%d", *port)))
 }
