@@ -50,6 +50,10 @@ func main() {
 	}
 
 	engine = html.NewFileSystem(http.FS(views), ".html")
+	// The renderer package owns the canonical template func map (round,
+	// inc, fmtDate, chartURL, searchURL, hasPrefix). Register it here so
+	// Fiber's view engine can parse the same templates without warnings.
+	engine.AddFuncMap(renderer.Funcs)
 
 	app := fiber.New(fiber.Config{
 		AppName:               Name,

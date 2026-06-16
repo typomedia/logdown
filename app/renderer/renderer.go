@@ -55,7 +55,10 @@ var pageFiles = map[string]string{
 	"app_upload_index": "upload.html",
 }
 
-var funcs = template.FuncMap{
+// Funcs is the template function map used by every page template. It is
+// exported so callers that compile templates outside this package (e.g. the
+// Fiber view engine in main.go) can register the same helpers.
+var Funcs = template.FuncMap{
 	"inc":       func(i int) int { return i + 1 },
 	"round":     Round,
 	"hasPrefix": strings.HasPrefix,
@@ -68,7 +71,7 @@ var funcs = template.FuncMap{
 func NewRenderer() (*Renderer, error) {
 	r := &Renderer{pages: map[string]*template.Template{}}
 	for route, file := range pageFiles {
-		t, err := template.New("base.html").Funcs(funcs).ParseFS(views.FS,
+		t, err := template.New("base.html").Funcs(Funcs).ParseFS(views.FS,
 			"base.html", file)
 		if err != nil {
 			return nil, fmt.Errorf("parsing %s: %w", file, err)
