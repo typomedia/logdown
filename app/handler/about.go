@@ -8,15 +8,20 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// systemInfo is computed once at startup. OS and CPU don't change at runtime,
+// so re-reading /etc/os-release and /proc/cpuinfo on every /about hit is
+// wasted work and a cheap amplification target.
+var systemInfo = map[string]string{
+	"os":    osRelease(),
+	"cpu":   cpuModel(),
+	"go":    strings.TrimPrefix(runtime.Version(), "go"),
+	"fiber": fiber.Version,
+}
+
 // about shows system information. Ports AboutController::info.
 func (h *Handler) about(c *fiber.Ctx) error {
 	p := h.page("app_about_info")
-	p.System = map[string]string{
-		"os":    osRelease(),
-		"cpu":   cpuModel(),
-		"go":    strings.TrimPrefix(runtime.Version(), "go"),
-		"fiber": fiber.Version,
-	}
+	p.System = systemInfo
 	return h.render(c, p)
 }
 
