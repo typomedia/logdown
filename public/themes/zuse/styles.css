@@ -213,15 +213,6 @@ html body footer div i.love {
 .dropzone div i.fa {
   font-size: 32pt;
 }
-.dropzone .dz-image {
-  display: none !important;
-}
-.dropzone .dz-preview {
-  display: none !important;
-}
-.dropzone .dz-message {
-  margin: 0 !important;
-}
 .dz-drag-hover {
   border: 2px dashed #82c841 !important;
   background: rgba(0, 0, 0, 0.05) !important;
