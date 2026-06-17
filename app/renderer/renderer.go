@@ -48,7 +48,7 @@ type Renderer struct {
 // pages maps a route name to its template file. Each is parsed together with
 // base.html so the page's {{define}} blocks override the layout's defaults.
 var pageFiles = map[string]string{
-	"logs_index":       "logs_index.html",
+	"logs_index":       "index.html",
 	"logs_search":      "search.html",
 	"app_chart_chart":  "chart.html",
 	"app_about_info":   "about.html",
